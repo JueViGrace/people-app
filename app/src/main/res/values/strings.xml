@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ComposeApp</string>
+    <string name="search_bar">Search Bar</string>
+    <string name="busca_un_empleado">Busca un empleado</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="empty">Empty</string>
+    <string name="personas_activas">Personas Activas</string>
+    <string name="personas_inactivas">Personas inactivas</string>
+    <string name="persona_inactiva">Persona Inactiva</string>
+    <string name="aceptar">Aceptar</string>
+</resources>
