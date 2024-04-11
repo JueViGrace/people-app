@@ -1,21 +1,22 @@
 package com.jvg.peopleapp
 
 import android.app.Application
+import com.jvg.peopleapp.core.di.dispatchersModule
 import com.jvg.peopleapp.core.di.realmModule
 import com.jvg.peopleapp.home.di.homeModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-class PeopleApp : Application() {
+class SelfManagerApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidLogger()
 
-            androidContext(this@PeopleApp)
+            androidContext(this@SelfManagerApp)
 
-            modules(realmModule(), homeModule)
+            modules(realmModule, dispatchersModule, homeModule)
         }
     }
 }

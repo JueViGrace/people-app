@@ -25,17 +25,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.home.domain.model.Person
 import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
+import com.jvg.peopleapp.home.domain.model.Person
+import org.mongodb.kbson.ObjectId
 
 @Composable
 fun PersonComponent(
     person: Person,
     showActive: Boolean = true,
     onSelect: (Person) -> Unit,
-    onActive: (Person, Boolean) -> Unit,
+    onActive: (ObjectId?, Boolean) -> Unit,
     onDelete: (Person) -> Unit
 ) {
     CustomClickableCard(
@@ -62,7 +63,7 @@ fun PersonComponent(
                 ),
                 icon = painterResource(id = R.drawable.ic_fingerprint_24px),
                 field = "Id",
-                value = person._id.toString()
+                value = person.id.toHexString()
             )
 
             RowComponent(
@@ -109,7 +110,7 @@ fun PersonComponent(
                         .padding(horizontal = 5.dp),
                     checked = person.active,
                     onCheckedChange = { _ ->
-                        onActive(person, !person.active)
+                        onActive(person.id, !person.active)
                     }
                 )
             }

@@ -1,19 +1,24 @@
 package com.jvg.peopleapp.home.di
 
-import com.jvg.peopleapp.home.data.local.HomeDataSourceImpl
-import com.jvg.peopleapp.home.domain.sources.HomeDataSource
+import com.jvg.peopleapp.core.common.Constants.IO_DISPATCHER
+import com.jvg.peopleapp.home.data.local.sources.PeopleDataSource
+import com.jvg.peopleapp.home.data.local.sources.PeopleDataSourceImpl
 import com.jvg.peopleapp.home.presentation.dashboard.viewmodel.DashborardViewModel
 import com.jvg.peopleapp.home.presentation.details.viewmodel.PersonViewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val homeModule = module {
-    single<HomeDataSource> {
-        HomeDataSourceImpl(get())
+
+    single<PeopleDataSource> {
+        PeopleDataSourceImpl(get(), get(named(IO_DISPATCHER)))
     }
+
     factory {
-        DashborardViewModel(get())
+        DashborardViewModel(get(), get(named(IO_DISPATCHER)))
     }
+
     factory {
-        PersonViewModel(get())
+        PersonViewModel(get(), get(named(IO_DISPATCHER)))
     }
 }

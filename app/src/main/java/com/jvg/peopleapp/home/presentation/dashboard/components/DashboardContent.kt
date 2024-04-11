@@ -23,11 +23,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.home.domain.model.Person
-import com.jvg.peopleapp.home.presentation.state.RequestState
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
 import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.LoadingScreen
+import com.jvg.peopleapp.core.state.RequestState
+import com.jvg.peopleapp.home.domain.model.Person
+import org.mongodb.kbson.ObjectId
 
 @Composable
 fun DashboardContent(
@@ -35,8 +36,8 @@ fun DashboardContent(
     people: RequestState<List<Person>>,
     showActive: Boolean = true,
     onSelect: ((Person) -> Unit)? = null,
-    onActive: ((Person, Boolean) -> Unit)? = null,
-    onDelete: ((Person) -> Unit)? = null
+    onActive: ((ObjectId?, Boolean) -> Unit)? = null,
+    onDelete: ((ObjectId?) -> Unit)? = null
 ) {
     var showDialog by remember {
         mutableStateOf(false)
@@ -77,7 +78,7 @@ fun DashboardContent(
                 ElevatedButton(
                     onClick = {
                         personToDelete?.let { person ->
-                            onDelete?.invoke(person)
+                            onDelete?.invoke(person.id)
                         }
                         showDialog = false
                         personToDelete = null
@@ -113,7 +114,9 @@ fun DashboardContent(
 
         people.DisplayResult(
             onLoading = { LoadingScreen() },
-            onError = { ErrorScreen(people.getErrorMessage()) },
+            onError = { message ->
+                ErrorScreen(message)
+            },
             onSuccess = { list ->
                 if (list.isNotEmpty()) {
                     LazyColumn(
@@ -124,7 +127,7 @@ fun DashboardContent(
                     ) {
                         items(
                             items = list,
-                            key = { employee -> employee._id.toString() }
+                            key = { employee -> employee.id.toString() }
                         ) { person ->
                             PersonComponent(
                                 person = person,
@@ -132,8 +135,8 @@ fun DashboardContent(
                                 onSelect = {
                                     onSelect?.invoke(it)
                                 },
-                                onActive = { selectedPerson, isActive ->
-                                    onActive?.invoke(selectedPerson, isActive)
+                                onActive = { id, isActive ->
+                                    onActive?.invoke(id, isActive)
                                 },
                                 onDelete = { selectedPerson ->
                                     personToDelete = selectedPerson

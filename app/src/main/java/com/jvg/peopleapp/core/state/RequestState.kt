@@ -1,4 +1,4 @@
-package com.jvg.peopleapp.home.presentation.state
+package com.jvg.peopleapp.core.state
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContent

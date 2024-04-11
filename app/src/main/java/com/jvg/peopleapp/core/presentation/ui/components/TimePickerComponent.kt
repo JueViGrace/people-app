@@ -35,8 +35,9 @@ import com.jvg.peopleapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerComponent(
-    value: String,
+    label: String,
     painterResource: Painter,
+    value: String,
     onTextSelected: (String) -> Unit,
     errorStatus: Boolean = false
 ) {
@@ -85,6 +86,7 @@ fun TimePickerComponent(
                 TimePicker(state = state)
                 ElevatedButton(
                     onClick = {
+                        onTextSelected(hourSelected)
                         openDialog = false
                     }
                 ) {
@@ -93,8 +95,6 @@ fun TimePickerComponent(
             }
         }
     }
-
-    onTextSelected(hourSelected)
 
     Box {
         CustomOutlinedTextField(
@@ -108,15 +108,15 @@ fun TimePickerComponent(
                         openDialog = true
                     },
                 ),
-            value = hourSelected,
+            value = value,
             onValueChanged = {
                 hourSelected = it
-                onTextSelected.invoke(it)
+                onTextSelected(hourSelected)
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next
             ),
-            label = { CustomText(text = value) }, leadingIcon = {
+            label = { CustomText(text = label) }, leadingIcon = {
                 Icon(
                     painter = painterResource,
                     contentDescription = "",

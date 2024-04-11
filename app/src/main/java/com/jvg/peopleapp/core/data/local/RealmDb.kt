@@ -5,21 +5,20 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 
 class RealmDb {
-    var realm: Realm? = null
+    var realm: Realm = configureRealm()
 
     init {
         configureRealm()
     }
 
-    private fun configureRealm() {
-        if (realm == null || realm!!.isClosed()) {
-            val config = RealmConfiguration.Builder(
-                schema = setOf(PersonCollection::class)
-            )
-                .compactOnLaunch()
-                .deleteRealmIfMigrationNeeded()
-                .build()
-            realm = Realm.open(config)
-        }
+    private fun configureRealm(): Realm {
+        val config = RealmConfiguration.Builder(
+            schema = setOf(PersonCollection::class)
+        )
+            .compactOnLaunch()
+            .deleteRealmIfMigrationNeeded()
+            .build()
+
+        return Realm.open(config)
     }
 }

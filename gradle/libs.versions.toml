@@ -13,7 +13,7 @@ kotlinxCoroutinesCore = "1.8.0"
 kotlin-serialization = "1.6.2"
 koin-version = "3.5.4"
 voyager = "1.0.0"
-realm = "1.13.0"
+realm = "1.14.1"
 
 [libraries]
 # [ANDROID]

@@ -1,16 +1,28 @@
 package com.jvg.peopleapp.home.presentation.details.viewmodel
 
+import android.util.Log
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.jvg.peopleapp.core.state.RequestState
+import com.jvg.peopleapp.home.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.home.domain.model.Person
-import com.jvg.peopleapp.home.domain.sources.HomeDataSource
+import com.jvg.peopleapp.home.presentation.details.state.PersonDetailsState
 import com.jvg.peopleapp.home.presentation.events.PeopleActions
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.mongodb.kbson.ObjectId
 
 class PersonViewModel(
-    private val homeDataSource: HomeDataSource
+    private val peopleDataSource: PeopleDataSource,
+    private val ioDispatcher: CoroutineDispatcher
 ) : ScreenModel {
+
+    private var _state: MutableStateFlow<PersonDetailsState> = MutableStateFlow(PersonDetailsState())
+    val state: StateFlow<PersonDetailsState> = _state.asStateFlow()
 
     fun setAction(action: PeopleActions) {
         when (action) {
@@ -21,15 +33,30 @@ class PersonViewModel(
         }
     }
 
+    fun findUser(id: ObjectId) {
+        _state.update { s ->
+            s.copy(person = RequestState.Loading)
+        }
+
+        screenModelScope.launch {
+            peopleDataSource.getOneById(id).collect { value ->
+                _state.update { s ->
+                    s.copy(person = value)
+                }
+            }
+        }
+    }
+
     private fun addPerson(person: Person) {
-        screenModelScope.launch(Dispatchers.IO) {
-            homeDataSource.addPerson(person = person)
+        screenModelScope.launch(ioDispatcher) {
+            peopleDataSource.addPerson(person = person.toDatabase())
         }
     }
 
     private fun updatePerson(person: Person) {
-        screenModelScope.launch(Dispatchers.IO) {
-            homeDataSource.updatePerson(person = person)
+        screenModelScope.launch(ioDispatcher) {
+            Log.i("CurrentStartsatV", "Content: ${person}")
+            peopleDataSource.updatePerson(person = person.toDatabase())
         }
     }
 }

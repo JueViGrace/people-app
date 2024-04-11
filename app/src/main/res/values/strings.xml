@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">ComposeApp</string>
+    <string name="app_name">Self Manager</string>
     <string name="search_bar">Search Bar</string>
-    <string name="busca_un_empleado">Busca un empleado</string>
+    <string name="busca_una_persona">Busca una persona</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="empty">Empty</string>

@@ -16,13 +16,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jvg.peopleapp.home.presentation.events.PeopleActions
-import com.jvg.peopleapp.home.domain.model.Person
-import com.jvg.peopleapp.home.presentation.dashboard.components.DashboardContent
-import com.jvg.peopleapp.home.presentation.dashboard.viewmodel.DashborardViewModel
-import com.jvg.peopleapp.home.presentation.navigation.routes.HomeScreens
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
+import com.jvg.peopleapp.home.presentation.dashboard.components.DashboardContent
+import com.jvg.peopleapp.home.presentation.dashboard.viewmodel.DashborardViewModel
+import com.jvg.peopleapp.home.presentation.events.PeopleActions
+import com.jvg.peopleapp.home.presentation.navigation.routes.HomeScreens
 
 object DashboardScreen : Screen {
     private fun readResolve(): Any = DashboardScreen
@@ -41,9 +40,11 @@ object DashboardScreen : Screen {
                 AppBar()
             },
             floatingActionButton = {
-                FABComponent(onAdd = {
-                    navigator.push(HomeScreens.PersonDetails().screen)
-                })
+                FABComponent(
+                    onAdd = {
+                        navigator.push(HomeScreens.PersonDetails().screen)
+                    }
+                )
             },
             content = { paddingValues ->
 
@@ -60,14 +61,14 @@ object DashboardScreen : Screen {
                         modifier = Modifier.weight(1f),
                         people = state.activePeople,
                         showActive = true,
-                        onSelect = { selectedPerson ->
-                            navigator.push(HomeScreens.PersonDetails(selectedPerson).screen)
+                        onSelect = { person ->
+                            navigator.push(HomeScreens.PersonDetails(person).screen)
                         },
-                        onActive = { person: Person, isActive: Boolean ->
-                            viewModel.setActions(action = PeopleActions.SetActive(person, isActive))
+                        onActive = { id, isActive: Boolean ->
+                            viewModel.setActions(action = PeopleActions.SetActive(id, isActive))
                         },
-                        onDelete = { person ->
-                            viewModel.setActions(action = PeopleActions.Delete(person))
+                        onDelete = { id ->
+                            viewModel.setActions(action = PeopleActions.Delete(id))
                         }
                     )
 
@@ -77,14 +78,14 @@ object DashboardScreen : Screen {
                         modifier = Modifier.weight(1f),
                         people = state.inactivePeople,
                         showActive = false,
-                        onSelect = { selectedPerson ->
-                            navigator.push(HomeScreens.PersonDetails(selectedPerson).screen)
+                        onSelect = { person ->
+                            navigator.push(HomeScreens.PersonDetails(person).screen)
                         },
-                        onActive = { person: Person, isActive: Boolean ->
-                            viewModel.setActions(action = PeopleActions.SetActive(person, isActive))
+                        onActive = { id, isActive: Boolean ->
+                            viewModel.setActions(action = PeopleActions.SetActive(id, isActive))
                         },
-                        onDelete = { person ->
-                            viewModel.setActions(action = PeopleActions.Delete(person))
+                        onDelete = { id ->
+                            viewModel.setActions(action = PeopleActions.Delete(id))
                         }
                     )
                 }

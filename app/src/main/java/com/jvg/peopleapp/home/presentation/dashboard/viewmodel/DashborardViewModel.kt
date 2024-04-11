@@ -3,35 +3,33 @@ package com.jvg.peopleapp.home.presentation.dashboard.viewmodel
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.common.Constants.DELAY
-import com.jvg.peopleapp.home.domain.model.Person
-import com.jvg.peopleapp.home.domain.sources.HomeDataSource
+import com.jvg.peopleapp.core.state.RequestState
+import com.jvg.peopleapp.home.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.home.presentation.dashboard.state.DashboardState
 import com.jvg.peopleapp.home.presentation.events.PeopleActions
-import com.jvg.peopleapp.home.presentation.state.RequestState
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-typealias MutablePeople = MutableStateFlow<DashboardState>
-typealias People = StateFlow<DashboardState>
+import org.mongodb.kbson.ObjectId
 
 class DashborardViewModel(
-    private val homeDataSource: HomeDataSource
+    private val peopleDataSource: PeopleDataSource,
+    private val ioDispatcher: CoroutineDispatcher
 ) : ScreenModel {
-    private var _state: MutablePeople = MutableStateFlow(DashboardState())
-    val state: People = _state
+    private var _state: MutableStateFlow<DashboardState> = MutableStateFlow(DashboardState())
+    val state: StateFlow<DashboardState> = _state.asStateFlow()
 
     init {
-        _state.update { s  ->
+        _state.update { s ->
             s.copy(activePeople = RequestState.Loading, inactivePeople = RequestState.Loading)
         }
         screenModelScope.launch {
             delay(DELAY)
-            homeDataSource.getActivePeople().collectLatest { value ->
+            peopleDataSource.getActivePeople().collect { value ->
                 _state.update { s ->
                     s.copy(
                         activePeople = value
@@ -42,7 +40,7 @@ class DashborardViewModel(
 
         screenModelScope.launch {
             delay(DELAY)
-            homeDataSource.getInactivePeople().collectLatest { value ->
+            peopleDataSource.getInactivePeople().collect { value ->
                 _state.update { s ->
                     s.copy(
                         inactivePeople = value
@@ -55,24 +53,24 @@ class DashborardViewModel(
     fun setActions(action: PeopleActions) {
         when (action) {
             is PeopleActions.SetActive -> {
-                setActive(action.person, action.isActive)
+                setActive(action.id, action.isActive)
             }
             is PeopleActions.Delete -> {
-                deleteEmployee(action.person)
+                deleteEmployee(action.id)
             }
             else -> {}
         }
     }
 
-    private fun setActive(person: Person, isActive: Boolean) {
-        screenModelScope.launch(Dispatchers.IO) {
-            homeDataSource.setActive(person, isActive)
+    private fun setActive(id: ObjectId?, isActive: Boolean) {
+        screenModelScope.launch(ioDispatcher) {
+            peopleDataSource.setActive(id, isActive)
         }
     }
 
-    private fun deleteEmployee(person: Person) {
-        screenModelScope.launch(Dispatchers.IO) {
-            homeDataSource.deletePerson(person)
+    private fun deleteEmployee(id: ObjectId?) {
+        screenModelScope.launch(ioDispatcher) {
+            peopleDataSource.deletePerson(id)
         }
     }
 }

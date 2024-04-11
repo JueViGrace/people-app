@@ -1,5 +1,6 @@
 package com.jvg.peopleapp.home.presentation.details.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,15 +37,13 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.core.common.toStringFormat
-import com.jvg.peopleapp.home.presentation.events.PeopleActions
+import com.jvg.peopleapp.core.presentation.ui.components.CustomText
+import com.jvg.peopleapp.core.presentation.ui.components.TimePickerComponent
 import com.jvg.peopleapp.home.domain.model.Person
 import com.jvg.peopleapp.home.domain.rules.Validator
 import com.jvg.peopleapp.home.presentation.details.components.TextFieldComponent
 import com.jvg.peopleapp.home.presentation.details.viewmodel.PersonViewModel
-import com.jvg.peopleapp.core.presentation.ui.components.CustomText
-import com.jvg.peopleapp.core.presentation.ui.components.TimePickerComponent
-import java.util.Date
+import com.jvg.peopleapp.home.presentation.events.PeopleActions
 
 data class PersonDetailsScreen(val person: Person? = null) : Screen {
     override val key: ScreenKey = uniqueScreenKey
@@ -54,6 +53,7 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<PersonViewModel>()
+
         val topBarTitle = if (
             person?.name?.isNotEmpty() == true && person.lastname.isNotEmpty()
         ) {
@@ -78,7 +78,7 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
             mutableStateOf(person?.email ?: "")
         }
         var currentStartsAt by remember {
-            mutableStateOf(person?.startsAt ?: Date().toStringFormat(1))
+            mutableStateOf(person?.startsAt ?: "")
         }
         var currentFinishesAt by remember {
             mutableStateOf(person?.finishesAt ?: "")
@@ -86,6 +86,9 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
         var currentActive by remember {
             mutableStateOf(person?.active ?: true)
         }
+
+        Log.i("CurrentStartsat", "Screen: $currentStartsAt")
+        Log.i("person value", "Screen: ${person?.startsAt}")
 
         // TODO: Move to viewmodel
 
@@ -164,7 +167,6 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                 }
             }
         ) { paddingValues ->
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -279,18 +281,22 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                     )
 
                     TimePickerComponent(
-                        value = "Hora de entrada",
+                        label = "Hora de entrada",
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
+                        value = currentStartsAt,
                         onTextSelected = {
+                            println(it)
                             currentStartsAt = it
                         },
                         errorStatus = currentStartsAt.isEmpty()
                     )
 
                     TimePickerComponent(
-                        value = "Hora de salida",
+                        label = "Hora de salida",
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
+                        value = currentFinishesAt,
                         onTextSelected = {
+                            println(it)
                             currentFinishesAt = it
                         },
                         errorStatus = currentFinishesAt.isEmpty()
