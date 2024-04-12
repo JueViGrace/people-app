@@ -6,19 +6,20 @@ import com.jvg.peopleapp.home.data.local.model.PersonCollection
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import org.koin.dsl.module
+import kotlin.reflect.KClass
 
 val realmModule = module {
     single {
-        val config = RealmConfiguration.Builder(
-            schema = setOf(PersonCollection::class)
+        Realm.open(
+            configuration = RealmConfiguration.create(
+                schema = setOf(PersonCollection::class)
+            )
         )
-            .compactOnLaunch()
-            .deleteRealmIfMigrationNeeded()
-            .build()
-        Realm.open(config)
     }
 
+    single { PersonCollection::class }
+
     single<LocalDataSource<PersonCollection>> {
-        LocalDataSourceImpl(get(), PersonCollection::class)
+        LocalDataSourceImpl(get(), get<KClass<PersonCollection>>())
     }
 }

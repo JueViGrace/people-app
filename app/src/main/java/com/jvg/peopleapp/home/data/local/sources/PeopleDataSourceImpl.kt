@@ -80,7 +80,6 @@ class PeopleDataSourceImpl(
             emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
         }.collect { pc ->
             if (pc != null) {
-                Log.i("datasource", "getOneById: ${pc.startsAt}")
                 emit(
                     RequestState.Success(
                         data = pc.toDomain()
@@ -96,13 +95,15 @@ class PeopleDataSourceImpl(
         localDataSource.add(person)
     }
 
-    override suspend fun updatePerson(person: PersonCollection) {
-        val queriedPerson = localDataSource.realm.query<PersonCollection>(query = "_id == $0", person._id).first().find()?.let { p: PersonCollection ->
+    override suspend fun updatePerson(person: Person) {
+        val queriedPerson = localDataSource.realm.query<PersonCollection>(
+            query = "_id == $0",
+            person.id
+        ).first().find()
 
         localDataSource.realm.write {
-        Log.i("Actualizar query person", "updatePerson: $p")
-        Log.i("person", "updatePerson: $person")
-                findLatest(p)?.let { currentPerson ->
+            queriedPerson?.let { per ->
+                findLatest(per)?.let { currentPerson ->
                     currentPerson.name = person.name
                     currentPerson.lastname = person.lastname
                     currentPerson.code = person.code

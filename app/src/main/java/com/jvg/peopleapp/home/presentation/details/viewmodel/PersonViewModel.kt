@@ -1,6 +1,5 @@
 package com.jvg.peopleapp.home.presentation.details.viewmodel
 
-import android.util.Log
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.state.RequestState
@@ -33,7 +32,7 @@ class PersonViewModel(
         }
     }
 
-    fun findUser(id: ObjectId) {
+    fun findUser(id: ObjectId?) {
         _state.update { s ->
             s.copy(person = RequestState.Loading)
         }
@@ -55,8 +54,7 @@ class PersonViewModel(
 
     private fun updatePerson(person: Person) {
         screenModelScope.launch(ioDispatcher) {
-            Log.i("CurrentStartsatV", "Content: ${person}")
-            peopleDataSource.updatePerson(person = person.toDatabase())
+            peopleDataSource.updatePerson(person = person)
         }
     }
 }

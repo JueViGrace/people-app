@@ -12,7 +12,7 @@ interface PeopleDataSource {
     fun getInactivePeople(): Flow<RequestState<List<Person>>>
     fun getOneById(id: ObjectId?): Flow<RequestState<Person>>
     suspend fun addPerson(person: PersonCollection)
-    suspend fun updatePerson(person: PersonCollection)
+    suspend fun updatePerson(person: Person)
     suspend fun setActive(id: ObjectId?, isActive: Boolean)
     suspend fun deletePerson(id: ObjectId?)
 }

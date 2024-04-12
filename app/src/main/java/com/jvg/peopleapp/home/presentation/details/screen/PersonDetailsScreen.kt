@@ -1,6 +1,5 @@
 package com.jvg.peopleapp.home.presentation.details.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,6 +43,7 @@ import com.jvg.peopleapp.home.domain.rules.Validator
 import com.jvg.peopleapp.home.presentation.details.components.TextFieldComponent
 import com.jvg.peopleapp.home.presentation.details.viewmodel.PersonViewModel
 import com.jvg.peopleapp.home.presentation.events.PeopleActions
+import org.mongodb.kbson.ObjectId
 
 data class PersonDetailsScreen(val person: Person? = null) : Screen {
     override val key: ScreenKey = uniqueScreenKey
@@ -87,13 +87,10 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
             mutableStateOf(person?.active ?: true)
         }
 
-        Log.i("CurrentStartsat", "Screen: $currentStartsAt")
-        Log.i("person value", "Screen: ${person?.startsAt}")
-
         // TODO: Move to viewmodel
-
-        val result = Validator.validatePerson(
+        val newPerson =
             Person(
+                id = if (person != null) person.id else ObjectId(),
                 name = currentName,
                 lastname = currentLastname,
                 code = currentCode,
@@ -103,6 +100,9 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                 finishesAt = currentFinishesAt,
                 active = currentActive
             )
+
+        val result = Validator.validatePerson(
+            newPerson
         )
 
         val errors = listOfNotNull(
@@ -131,31 +131,13 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                             if (person != null) {
                                 viewModel.setAction(
                                     action = PeopleActions.Update(
-                                        person = Person(
-                                            name = currentName,
-                                            lastname = currentLastname,
-                                            code = currentCode,
-                                            phone = currentPhone,
-                                            email = currentEmail,
-                                            startsAt = currentStartsAt,
-                                            finishesAt = currentFinishesAt,
-                                            active = currentActive
-                                        )
+                                        person = newPerson
                                     )
                                 )
                             } else {
                                 viewModel.setAction(
                                     action = PeopleActions.Add(
-                                        person = Person(
-                                            name = currentName,
-                                            lastname = currentLastname,
-                                            code = currentCode,
-                                            phone = currentPhone,
-                                            email = currentEmail,
-                                            startsAt = currentStartsAt,
-                                            finishesAt = currentFinishesAt,
-                                            active = currentActive
-                                        )
+                                        person = newPerson
                                     )
                                 )
                             }
@@ -285,7 +267,6 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
                         value = currentStartsAt,
                         onTextSelected = {
-                            println(it)
                             currentStartsAt = it
                         },
                         errorStatus = currentStartsAt.isEmpty()
@@ -296,7 +277,6 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
                         value = currentFinishesAt,
                         onTextSelected = {
-                            println(it)
                             currentFinishesAt = it
                         },
                         errorStatus = currentFinishesAt.isEmpty()

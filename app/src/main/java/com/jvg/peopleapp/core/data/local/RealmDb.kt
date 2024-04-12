@@ -12,13 +12,15 @@ class RealmDb {
     }
 
     private fun configureRealm(): Realm {
-        val config = RealmConfiguration.Builder(
-            schema = setOf(PersonCollection::class)
-        )
-            .compactOnLaunch()
-            .deleteRealmIfMigrationNeeded()
-            .build()
-
-        return Realm.open(config)
+        if (realm.isClosed()) {
+            val config = RealmConfiguration.Builder(
+                schema = setOf(PersonCollection::class)
+            )
+                .compactOnLaunch()
+                .deleteRealmIfMigrationNeeded()
+                .build()
+            realm = Realm.open(config)
+        }
+        return realm
     }
 }
