@@ -16,8 +16,8 @@ fun RowComponent(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(5.dp, Alignment.Start),
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     icon: Painter? = null,
-    field: String,
-    value: String
+    field: String = "",
+    value: String = ""
 ) {
     Row(
         modifier = modifier,
@@ -25,7 +25,18 @@ fun RowComponent(
         verticalAlignment = verticalAlignment
     ) {
         if (icon != null) { Icon(painter = icon, contentDescription = "Icon", modifier = Modifier.size(20.dp)) }
-        CustomText(text = "$field:")
-        CustomText(text = value)
+
+        when {
+            field.isNotEmpty() && value.isNotEmpty() -> {
+                CustomText(text = "$field:")
+                CustomText(text = value)
+            }
+            field.isNotEmpty() -> {
+                CustomText(text = "$field:")
+            }
+            value.isNotEmpty() -> {
+                CustomText(text = value)
+            }
+        }
     }
 }

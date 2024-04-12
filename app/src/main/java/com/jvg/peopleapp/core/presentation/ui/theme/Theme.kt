@@ -101,13 +101,9 @@ fun AppTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            if (darkTheme) {
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+                !darkTheme
                 window.statusBarColor = colorScheme.surface.toArgb()
-            } else {
-                window.statusBarColor = colorScheme.primary.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
-                    darkTheme
-            }
         }
 
         MaterialTheme(
