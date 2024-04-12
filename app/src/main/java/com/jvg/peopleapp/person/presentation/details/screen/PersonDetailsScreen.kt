@@ -110,7 +110,9 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
             result.lastnameError,
             result.codeError,
             result.phoneError,
-            result.emailError
+            result.emailError,
+            result.startsAtError,
+            result.finishesAtError
         )
 
         Scaffold(
@@ -256,29 +258,33 @@ data class PersonDetailsScreen(val person: Person? = null) : Screen {
                         supportingText = result.emailError,
                         errorStatus = result.emailError?.isNotEmpty() == true,
                         keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
+                            imeAction = ImeAction.Done,
                             keyboardType = KeyboardType.Email
                         ),
                         icon = R.drawable.ic_mail_24px
                     )
 
                     TimePickerComponent(
+                        modifier = Modifier.padding(horizontal = 5.dp),
                         label = "Hora de entrada",
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
                         value = currentStartsAt,
                         onTextSelected = {
                             currentStartsAt = it
                         },
+                        supportingText = result.startsAtError,
                         errorStatus = currentStartsAt.isEmpty()
                     )
 
                     TimePickerComponent(
+                        modifier = Modifier.padding(horizontal = 5.dp),
                         label = "Hora de salida",
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
                         value = currentFinishesAt,
                         onTextSelected = {
                             currentFinishesAt = it
                         },
+                        supportingText = result.finishesAtError,
                         errorStatus = currentFinishesAt.isEmpty()
                     )
 

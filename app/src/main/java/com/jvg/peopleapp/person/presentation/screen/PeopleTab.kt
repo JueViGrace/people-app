@@ -43,7 +43,7 @@ object PeopleTab : Tab {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<DashborardViewModel>()
         val state by viewModel.state.collectAsState()
-
+        // TODO: CREAR NAVIGATOR
         Column(
             modifier = Modifier
                 .fillMaxSize()

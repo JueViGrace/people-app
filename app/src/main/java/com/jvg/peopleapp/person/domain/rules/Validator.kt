@@ -31,6 +31,14 @@ object Validator {
             result = result.copy(phoneError = "Teléfono debe tener 10 o más caracteres")
         }
 
+        if (person.startsAt.isBlank()) {
+            result = result.copy(startsAtError = "Hora de entrada no puede estar vacío")
+        }
+
+        if (person.finishesAt.isBlank()) {
+            result = result.copy(finishesAtError = "Hora de salida no puede estar vacío")
+        }
+
         return result
     }
 
@@ -39,6 +47,8 @@ object Validator {
         val lastnameError: String? = null,
         val emailError: String? = null,
         val codeError: String? = null,
-        val phoneError: String? = null
+        val phoneError: String? = null,
+        val startsAtError: String? = null,
+        val finishesAtError: String? = null,
     )
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,25 +24,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.jvg.peopleapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerComponent(
+    modifier: Modifier = Modifier,
     label: String,
     painterResource: Painter,
     value: String,
     onTextSelected: (String) -> Unit,
+    supportingText: String? = null,
     errorStatus: Boolean = false
 ) {
     var openDialog by remember {
         mutableStateOf(false)
     }
+
+    var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
     val state = rememberTimePickerState()
 
@@ -98,43 +102,41 @@ fun TimePickerComponent(
 
     Box {
         CustomOutlinedTextField(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 5.dp)
-                .clickable(
-                    enabled = true,
-                    role = Role.Button,
-                    onClick = {
-                        openDialog = true
-                    },
-                ),
+                .onGloballyPositioned { coordinates ->
+                    textfieldSize = coordinates.size.toSize()
+                },
             value = value,
             onValueChanged = {
                 hourSelected = it
                 onTextSelected(hourSelected)
             },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next
-            ),
-            label = { CustomText(text = label) }, leadingIcon = {
+            label = { CustomText(text = label) },
+            leadingIcon = {
                 Icon(
                     painter = painterResource,
                     contentDescription = "",
-                    modifier = Modifier.clickable(
-                        enabled = true,
-                        role = Role.Button,
-                        onClick = {
-                            openDialog = true
-                        },
-                    )
+                    modifier = Modifier.clickable {
+                        openDialog = true
+                    }
                 )
-            }, singleLine = true, maxLines = 1, isError = errorStatus
+            },
+            supportingText = {
+                if (supportingText != null) {
+                    CustomText(text = supportingText)
+                }
+                             },
+            singleLine = true,
+            maxLines = 1,
+            isError = errorStatus,
+            readOnly = true
         )
         Box(
             modifier = Modifier
+                .clickable { openDialog = true }
                 .matchParentSize()
                 .alpha(0f)
-                .clickable(onClick = { openDialog = true }),
         )
     }
 }
