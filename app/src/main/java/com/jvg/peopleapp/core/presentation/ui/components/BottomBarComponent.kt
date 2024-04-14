@@ -14,17 +14,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.tab.TabNavigator
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import com.jvg.peopleapp.core.common.Constants.bottomList
-import com.jvg.peopleapp.core.presentation.navigation.details.DetailScreens
 
 @Composable
-fun BottomBarComponent(tabNavigator: TabNavigator, navigator: Navigator) {
-    val currentRoute = tabNavigator.current.key
+fun BottomBarComponent(navigator: Navigator) {
+    val tabNavigator = LocalTabNavigator.current
+    val currentRoute = tabNavigator.current
     BottomAppBar(
         actions = {
             bottomList.forEach { tab ->
-                val selected = currentRoute == tab.key
+                val selected = currentRoute == tab
 
                 BottomNavigationItem(
                     modifier = Modifier.padding(horizontal = 5.dp),
@@ -34,11 +34,13 @@ fun BottomBarComponent(tabNavigator: TabNavigator, navigator: Navigator) {
                         tabNavigator.current = tab
                     },
                     icon = {
-                        Icon(
-                            modifier = Modifier.size(22.dp),
-                            painter = tab.options.icon!!,
-                            contentDescription = tab.options.title
-                        )
+                        tab.options.icon?.let { icon ->
+                            Icon(
+                                modifier = Modifier.size(22.dp),
+                                painter = icon,
+                                contentDescription = tab.options.title
+                            )
+                        }
                     },
                     label = {
                         CustomText(
@@ -53,7 +55,7 @@ fun BottomBarComponent(tabNavigator: TabNavigator, navigator: Navigator) {
         floatingActionButton = {
             FABComponent(
                 onAdd = {
-                    navigator.push(DetailScreens.PersonDetails().screen)
+
                 }
             )
         },

@@ -1,7 +1,7 @@
 package com.jvg.peopleapp.core.common
 
 import cafe.adriel.voyager.navigator.tab.Tab
-import com.jvg.peopleapp.core.presentation.navigation.home.routes.HomeScreens
+import com.jvg.peopleapp.home.routes.HomeTabs
 
 object Constants {
     const val CODE_LENGTH: Int = 8
@@ -15,7 +15,7 @@ object Constants {
     const val PEOPLE = "People"
 
     val bottomList: List<Tab> = listOf(
-        HomeScreens.Dashboard.tab,
-        HomeScreens.People.tab,
+        HomeTabs.Dashboard.tab,
+        HomeTabs.People.tab,
     )
 }

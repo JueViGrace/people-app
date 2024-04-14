@@ -1,7 +1,7 @@
 package com.jvg.peopleapp.core.presentation.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -15,6 +15,6 @@ fun FABComponent(
         onClick = { onAdd() },
         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
     ) {
-        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Icon")
+        Icon(imageVector = Icons.Default.Add, contentDescription = "Add Icon")
     }
 }

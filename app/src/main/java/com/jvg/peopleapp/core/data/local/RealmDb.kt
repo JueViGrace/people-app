@@ -1,6 +1,6 @@
 package com.jvg.peopleapp.core.data.local
 
-import com.jvg.peopleapp.person.data.local.model.PersonCollection
+import com.jvg.peopleapp.people.data.local.model.PersonCollection
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 
