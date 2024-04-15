@@ -25,9 +25,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
@@ -39,15 +37,11 @@ import com.jvg.peopleapp.people.presentation.person.components.TextFieldComponen
 import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
 import com.jvg.peopleapp.people.presentation.viewmodel.PeopleViewModel
 
-data class PersonDetailsScreen(val person0: Person? = null) : Screen {
-    override val key: ScreenKey = uniqueScreenKey
-
+data class CreatePersonScreen(val person: Person? = null) : Screen {
     @Composable
     override fun Content() {
-        // TODO: CAMBIAR A DETALLES SIN EDICION
-
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<PeopleViewModel>()
+        val viewModel = navigator.getNavigatorScreenModel<PeopleViewModel>()
         val state = viewModel.state.collectAsState()
         val person = viewModel.newPerson
 

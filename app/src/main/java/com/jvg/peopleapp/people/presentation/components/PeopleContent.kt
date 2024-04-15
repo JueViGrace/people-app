@@ -102,11 +102,13 @@ fun DashboardContent(
     ) {
         CustomText(
             modifier = Modifier.fillMaxWidth(),
-            text = if (showActive) {
+            text = "Personas"
+            /*text = if (showActive) {
                 stringResource(R.string.personas_activas)
             } else {
                 stringResource(R.string.personas_inactivas)
-            },
+            }*/
+            ,
             fontSize = MaterialTheme.typography.titleMedium.fontSize,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
@@ -127,7 +129,7 @@ fun DashboardContent(
                     ) {
                         items(
                             items = list,
-                            key = { employee -> employee.id.toString() }
+                            key = { person -> person.id.toString() }
                         ) { person ->
                             PersonComponent(
                                 person = person,

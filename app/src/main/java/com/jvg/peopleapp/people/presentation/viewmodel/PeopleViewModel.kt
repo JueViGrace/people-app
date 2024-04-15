@@ -1,27 +1,52 @@
 package com.jvg.peopleapp.people.presentation.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.common.Constants.DELAY
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
+import com.jvg.peopleapp.people.domain.model.Person
+import com.jvg.peopleapp.people.domain.rules.Validator
+import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
 import com.jvg.peopleapp.people.presentation.state.PeopleState
-import com.jvg.peopleapp.people.presentation.events.PeopleActions
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
 
 class PeopleViewModel(
     private val peopleDataSource: PeopleDataSource,
     private val ioDispatcher: CoroutineDispatcher
 ) : ScreenModel {
     private var _state: MutableStateFlow<PeopleState> = MutableStateFlow(PeopleState())
-    val state: StateFlow<PeopleState> = _state.asStateFlow()
+
+//    val state: StateFlow<PeopleState> = _state.asStateFlow()
+    val state = combine(
+        _state,
+        peopleDataSource.getActivePeople(),
+        peopleDataSource.getAllPeople(),
+        peopleDataSource.getInactivePeople()
+    ) { state, inactivePeople, people, activePeople ->
+        state.copy(
+            people = people,
+            activePeople = activePeople,
+            inactivePeople = inactivePeople
+        )
+    }.stateIn(
+        screenModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        PeopleState()
+    )
+
+    var newPerson: Person? by mutableStateOf(null)
+        private set
 
     init {
         _state.update { s ->
@@ -50,27 +75,151 @@ class PeopleViewModel(
         }
     }
 
-    fun setActions(action: PeopleActions) {
-        when (action) {
-            is PeopleActions.SetActive -> {
-                setActive(action.id, action.isActive)
-            }
-            is PeopleActions.Delete -> {
-                deletePerson(action.id)
-            }
-            else -> {}
-        }
-    }
+    fun onEvent(event: PersonEvent) {
+        when (event) {
+            is PersonEvent.DeletePerson -> {
+                screenModelScope.launch {
+                    if (event.id != null) {
+                        peopleDataSource.deletePerson(event.id)
+                    }
 
-    private fun setActive(id: ObjectId?, isActive: Boolean) {
-        screenModelScope.launch(ioDispatcher) {
-            peopleDataSource.setActive(id, isActive)
-        }
-    }
+                    _state.value.selectedPerson?.id?.let { id ->
+                        peopleDataSource.deletePerson(id)
+                    }
+                }
+            }
+            is PersonEvent.EditPerson -> {
+                newPerson = event.person
+            }
+            is PersonEvent.OnActiveChanged -> {
+                newPerson = newPerson?.copy(
+                    active = event.value
+                )
+            }
+            is PersonEvent.OnCodeChanged -> {
+                newPerson = newPerson?.copy(
+                    code = event.value
+                )
+            }
+            is PersonEvent.OnEmailChanged -> {
+                newPerson = newPerson?.copy(
+                    email = event.value
+                )
+            }
+            is PersonEvent.OnFinishesAtChanged -> {
+                newPerson = newPerson?.copy(
+                    finishesAt = event.value
+                )
+            }
+            is PersonEvent.OnLastNameChanged -> {
+                newPerson = newPerson?.copy(
+                    lastname = event.value
+                )
+            }
+            is PersonEvent.OnNameChanged -> {
+                newPerson = newPerson?.copy(
+                    name = event.value
+                )
+            }
+            is PersonEvent.OnPhoneChanged -> {
+                newPerson = newPerson?.copy(
+                    phone = event.value
+                )
+            }
+            is PersonEvent.OnStartsAtChanged -> {
+                newPerson = newPerson?.copy(
+                    startsAt = event.value
+                )
+            }
+            PersonEvent.SavePerson -> {
+                newPerson?.let { person: Person ->
+                    val result = Validator.validatePerson(person)
+                    val errors = listOfNotNull(
+                        result.nameError,
+                        result.lastnameError,
+                        result.codeError,
+                        result.phoneError,
+                        result.emailError,
+                        result.startsAtError,
+                        result.finishesAtError
+                    )
 
-    private fun deletePerson(id: ObjectId?) {
-        screenModelScope.launch(ioDispatcher) {
-            peopleDataSource.deletePerson(id)
+                    if (errors.isEmpty()) {
+                        _state.update { peopleState ->
+                            peopleState.copy(
+                                nameError = null,
+                                lastNameError = null,
+                                codeError = null,
+                                phoneError = null,
+                                emailError = null,
+                                startsAtError = null,
+                                finishesAtError = null,
+                                errors = false
+                            )
+                        }
+                        screenModelScope.launch {
+                            peopleDataSource.addPerson(person.toDatabase())
+                        }
+                    } else {
+                        _state.update { peopleState ->
+                            peopleState.copy(
+                                nameError = result.nameError,
+                                lastNameError = result.lastnameError,
+                                codeError = result.codeError,
+                                phoneError = result.phoneError,
+                                emailError = result.emailError,
+                                startsAtError = result.startsAtError,
+                                finishesAtError = result.finishesAtError,
+                                errors = true
+                            )
+                        }
+                    }
+                }
+            }
+            is PersonEvent.SelectedPerson -> {
+                _state.update { peopleState ->
+                    peopleState.copy(
+                        selectedPerson = event.person
+                    )
+                }
+            }
+            PersonEvent.OnAddNewPerson -> {
+                newPerson = Person(
+                    name = "",
+                    lastname = "",
+                    code = "",
+                    phone = "",
+                    email = "",
+                    startsAt = "",
+                    finishesAt = "",
+                    active = true
+                )
+            }
+
+            is PersonEvent.SetActive -> {
+                screenModelScope.launch {
+                    peopleDataSource.setActive(event.id, event.isActive)
+                }
+            }
+
+            PersonEvent.DissmissPerson -> {
+                screenModelScope.launch {
+                    _state.update { peopleState ->
+                        peopleState.copy(
+                            nameError = null,
+                            lastNameError = null,
+                            codeError = null,
+                            phoneError = null,
+                            emailError = null,
+                            startsAtError = null,
+                            finishesAtError = null,
+                            errors = null,
+                            selectedPerson = null
+                        )
+                    }
+                    newPerson = null
+                }
+            }
         }
     }
 }

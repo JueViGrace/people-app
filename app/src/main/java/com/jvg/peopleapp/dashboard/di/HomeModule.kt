@@ -10,4 +10,5 @@ val homeModule = module {
     factory {
         PeopleViewModel(get(), get(named(IO_DISPATCHER)))
     }
+
 }
