@@ -122,11 +122,11 @@ fun TimePickerComponent(
                     }
                 )
             },
-            supportingText = {
-                if (supportingText != null) {
-                    CustomText(text = supportingText)
-                }
-                             },
+            supportingText = if (supportingText != null) {
+                { CustomText(text = supportingText) }
+            } else {
+                null
+            },
             singleLine = true,
             maxLines = 1,
             isError = errorStatus,

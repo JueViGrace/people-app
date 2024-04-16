@@ -4,7 +4,7 @@ import android.app.Application
 import com.jvg.peopleapp.core.di.dispatchersModule
 import com.jvg.peopleapp.core.di.realmModule
 import com.jvg.peopleapp.dashboard.di.homeModule
-import com.jvg.peopleapp.people.di.personModule
+import com.jvg.peopleapp.people.di.peopleModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -17,7 +17,7 @@ class SelfManagerApp : Application() {
 
             androidContext(this@SelfManagerApp)
 
-            modules(realmModule, dispatchersModule, personModule, homeModule)
+            modules(realmModule, dispatchersModule, peopleModule, homeModule)
         }
     }
 }

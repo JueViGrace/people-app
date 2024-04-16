@@ -6,7 +6,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
@@ -15,17 +14,18 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CustomClickableCard(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
-    shape: Shape = CardDefaults.outlinedShape,
+    shape: Shape = CardDefaults.elevatedShape,
     colors: CardColors = CardDefaults.cardColors(),
     elevation: CardElevation = CardDefaults.cardElevation(
         defaultElevation = 2.dp
     ),
-    border: BorderStroke? = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
+    border: BorderStroke? = null,
     content: @Composable (ColumnScope.() -> Unit)
 ) {
-    Card(
+    if (onClick != null) {
+        Card(
         modifier = modifier,
         onClick = onClick,
         enabled = enabled,
@@ -34,5 +34,15 @@ fun CustomClickableCard(
         colors = colors,
         border = border,
         content = content
-    )
+        )
+    } else {
+        Card(
+            modifier = modifier,
+            shape = shape,
+            elevation = elevation,
+            colors = colors,
+            border = border,
+            content = content
+        )
+    }
 }

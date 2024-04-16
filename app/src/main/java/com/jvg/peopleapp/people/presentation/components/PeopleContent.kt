@@ -1,8 +1,6 @@
 package com.jvg.peopleapp.people.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
@@ -31,11 +28,10 @@ import com.jvg.peopleapp.people.domain.model.Person
 import org.mongodb.kbson.ObjectId
 
 @Composable
-fun DashboardContent(
+fun PeopleContent(
     modifier: Modifier = Modifier,
     people: RequestState<List<Person>>,
-    showActive: Boolean = true,
-    onSelect: ((Person) -> Unit)? = null,
+    onSelect: ((ObjectId) -> Unit)? = null,
     onActive: ((ObjectId?, Boolean) -> Unit)? = null,
     onDelete: ((ObjectId?) -> Unit)? = null
 ) {
@@ -97,60 +93,42 @@ fun DashboardContent(
         )
     }
 
-    Column(
-        modifier.fillMaxWidth()
-    ) {
-        CustomText(
-            modifier = Modifier.fillMaxWidth(),
-            text = "Personas"
-            /*text = if (showActive) {
-                stringResource(R.string.personas_activas)
-            } else {
-                stringResource(R.string.personas_inactivas)
-            }*/
-            ,
-            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
-        )
-
-        people.DisplayResult(
-            onLoading = { LoadingScreen() },
-            onError = { message ->
-                ErrorScreen(message)
-            },
-            onSuccess = { list ->
-                if (list.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.Top)
-                    ) {
-                        items(
-                            items = list,
-                            key = { person -> person.id.toString() }
-                        ) { person ->
-                            PersonComponent(
-                                person = person,
-                                showActive = person.active,
-                                onSelect = {
-                                    onSelect?.invoke(it)
-                                },
-                                onActive = { id, isActive ->
-                                    onActive?.invoke(id, isActive)
-                                },
-                                onDelete = { selectedPerson ->
-                                    personToDelete = selectedPerson
-                                    showDialog = true
-                                }
-                            )
-                        }
+    people.DisplayResult(
+        onLoading = { LoadingScreen() },
+        onError = { message ->
+            ErrorScreen(message)
+        },
+        onSuccess = { list ->
+            if (list.isNotEmpty()) {
+                LazyColumn(
+                    modifier = modifier
+                        .padding(horizontal = 5.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.Top)
+                ) {
+                    items(
+                        items = list,
+                        key = { person -> person.id.toString() }
+                    ) { person ->
+                        PersonComponent(
+                            person = person,
+                            showActive = person.active,
+                            onSelect = { id ->
+                                onSelect?.invoke(id)
+                            },
+                            onActive = { id, isActive ->
+                                onActive?.invoke(id, isActive)
+                            },
+                            onDelete = { selectedPerson ->
+                                personToDelete = selectedPerson
+                                showDialog = true
+                            }
+                        )
                     }
-                } else {
-                    ErrorScreen()
                 }
+            } else {
+                ErrorScreen()
             }
-        )
-    }
+        }
+    )
 }

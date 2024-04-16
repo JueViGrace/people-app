@@ -1,18 +1,27 @@
 package com.jvg.peopleapp.people.di
 
 import com.jvg.peopleapp.core.common.Constants
-import com.jvg.peopleapp.people.presentation.person.viewmodel.PersonViewModel
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSourceImpl
+import com.jvg.peopleapp.people.presentation.person.viewmodel.PersonViewModel
+import com.jvg.peopleapp.people.presentation.viewmodel.PeopleViewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-val personModule = module {
+val peopleModule = module {
     single<PeopleDataSource> {
         PeopleDataSourceImpl(get(), get(named(Constants.IO_DISPATCHER)))
     }
 
     factory {
-        PersonViewModel(get(), get(named(Constants.IO_DISPATCHER)))
+        PeopleViewModel(get())
+    }
+
+    factory { parametersHolder ->
+        if (parametersHolder.isNotEmpty()) {
+            PersonViewModel(get(), id = parametersHolder.get())
+        } else {
+            PersonViewModel(get())
+        }
     }
 }

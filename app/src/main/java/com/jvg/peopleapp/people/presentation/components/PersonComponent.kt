@@ -35,7 +35,7 @@ import org.mongodb.kbson.ObjectId
 fun PersonComponent(
     person: Person,
     showActive: Boolean = true,
-    onSelect: (Person) -> Unit,
+    onSelect: (ObjectId) -> Unit,
     onActive: (ObjectId?, Boolean) -> Unit,
     onDelete: (Person) -> Unit
 ) {
@@ -43,7 +43,7 @@ fun PersonComponent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp),
-        onClick = { if (showActive) onSelect(person) else onDelete(person) },
+        onClick = { onSelect(person.id) },
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(

@@ -9,10 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,30 +23,38 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
+import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.TimePickerComponent
-import com.jvg.peopleapp.people.domain.model.Person
 import com.jvg.peopleapp.people.presentation.person.components.TextFieldComponent
 import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
-import com.jvg.peopleapp.people.presentation.viewmodel.PeopleViewModel
+import com.jvg.peopleapp.people.presentation.person.viewmodel.PersonViewModel
+import org.koin.core.parameter.emptyParametersHolder
+import org.koin.core.parameter.parametersOf
+import org.mongodb.kbson.ObjectId
 
-data class CreatePersonScreen(val person: Person? = null) : Screen {
+data class CreatePersonScreen(val id: ObjectId? = null) : Screen {
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = navigator.getNavigatorScreenModel<PeopleViewModel>()
+        val viewModel = getScreenModel<PersonViewModel>(
+            parameters = {
+                if (id != null) parametersOf(id) else emptyParametersHolder()
+            }
+        )
         val state = viewModel.state.collectAsState()
-        val person = viewModel.newPerson
+        val editPerson = viewModel.newPerson
 
         val topBarTitle = if (
-            person?.name?.isNotEmpty() == true && person.lastname.isNotEmpty()
+            editPerson?.name?.isNotEmpty() == true && editPerson.lastname.isNotEmpty()
         ) {
-            "${person.name} ${person.lastname}"
+            "${editPerson.name} ${editPerson.lastname}"
         } else {
             "Cree una nueva persona"
         }
@@ -59,30 +65,32 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                     title = topBarTitle,
                     icon = rememberVectorPainter(Icons.AutoMirrored.Default.ArrowBack),
                     onClick = {
-                        viewModel.onEvent(PersonEvent.DissmissPerson)
+                        viewModel.onEvent(PersonEvent.DismissPerson)
                         navigator.pop()
                     }
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.onEvent(PersonEvent.SavePerson)
-                        state.value.errors?.let { errors ->
-                            if (!errors) {
-                                navigator.pop()
-                            }
+                FABComponent(
+                    onAdd = {
+                        if (state.value.person.getSuccessDataOrNull() == null) {
+                            viewModel.onEvent(PersonEvent.SavePerson)
+                        } else {
+                            viewModel.onEvent(PersonEvent.UpdatePerson)
+                        }
+
+                        if (viewModel.getError()) {
+                            viewModel.onEvent(PersonEvent.DismissPerson)
+                            navigator.pop()
                         }
                     },
-                ) {
-                    Icon(imageVector = Icons.Default.Check, contentDescription = "Check icon")
-                }
+                    icon = painterResource(id = R.drawable.ic_done_24px)
+                )
             }
         ) { paddingValues ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
                     .padding(
                         top = paddingValues.calculateTopPadding(),
                         bottom = paddingValues.calculateBottomPadding()
@@ -101,14 +109,14 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 5.dp),
-                        value = person?.name ?: "",
+                        value = editPerson?.name ?: "",
                         newValue = { newValue ->
                             viewModel.onEvent(PersonEvent.OnNameChanged(newValue))
                         },
                         label = "Nombre",
                         placeholder = "Nombre de la persona...",
                         supportingText = state.value.nameError,
-                        errorStatus = state.value.nameError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.nameError?.isNotEmpty() ?: false,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Text
@@ -120,14 +128,14 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 5.dp),
-                        value = person?.lastname ?: "",
+                        value = editPerson?.lastname ?: "",
                         newValue = { newValue ->
                             viewModel.onEvent(PersonEvent.OnLastNameChanged(newValue))
                         },
                         label = "Apellido",
                         placeholder = "Apellido de la persona...",
                         supportingText = state.value.lastNameError,
-                        errorStatus = state.value.lastNameError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.lastNameError?.isNotEmpty() ?: false,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Text
@@ -139,14 +147,14 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 5.dp),
-                        value = person?.code ?: "",
+                        value = editPerson?.code ?: "",
                         newValue = { newValue ->
                             viewModel.onEvent(PersonEvent.OnCodeChanged(newValue))
                         },
                         label = "Cédula",
                         placeholder = "Cédula de la persona...",
                         supportingText = state.value.codeError,
-                        errorStatus = state.value.codeError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.codeError?.isNotEmpty() ?: false,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Number
@@ -158,14 +166,14 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 5.dp),
-                        value = person?.phone ?: "",
+                        value = editPerson?.phone ?: "",
                         newValue = { newValue ->
                             viewModel.onEvent(PersonEvent.OnPhoneChanged(newValue))
                         },
                         label = "Teléfono",
                         placeholder = "Teléfono de la persona...",
                         supportingText = state.value.phoneError,
-                        errorStatus = state.value.phoneError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.phoneError?.isNotEmpty() ?: false,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Phone
@@ -177,14 +185,14 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 5.dp),
-                        value = person?.email ?: "",
+                        value = editPerson?.email ?: "",
                         newValue = { newValue ->
                             viewModel.onEvent(PersonEvent.OnEmailChanged(newValue))
                         },
                         label = "Email",
                         placeholder = "Email de la persona...",
                         supportingText = state.value.emailError,
-                        errorStatus = state.value.emailError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.emailError?.isNotEmpty() ?: false,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done,
                             keyboardType = KeyboardType.Email
@@ -196,24 +204,24 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         modifier = Modifier.padding(horizontal = 5.dp),
                         label = "Hora de entrada",
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
-                        value = person?.startsAt ?: "",
+                        value = editPerson?.startsAt ?: "",
                         onTextSelected = { newValue ->
                             viewModel.onEvent(PersonEvent.OnStartsAtChanged(newValue))
                         },
                         supportingText = state.value.startsAtError,
-                        errorStatus = state.value.startsAtError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.startsAtError?.isNotEmpty() ?: false,
                     )
 
                     TimePickerComponent(
                         modifier = Modifier.padding(horizontal = 5.dp),
                         label = "Hora de salida",
                         painterResource = painterResource(id = R.drawable.ic_schedule_24px),
-                        value = person?.finishesAt ?: "",
+                        value = editPerson?.finishesAt ?: "",
                         onTextSelected = { newValue ->
                             viewModel.onEvent(PersonEvent.OnFinishesAtChanged(newValue))
                         },
                         supportingText = state.value.finishesAtError,
-                        errorStatus = state.value.finishesAtError?.isNotEmpty() ?: true,
+                        errorStatus = state.value.finishesAtError?.isNotEmpty() ?: false,
                     )
 
                     Row(
@@ -226,7 +234,7 @@ data class CreatePersonScreen(val person: Person? = null) : Screen {
                         CustomText(text = "Persona activa: ")
 
                         Checkbox(
-                            checked = person?.active ?: true,
+                            checked = editPerson?.active ?: true,
                             onCheckedChange = { newValue ->
                                 viewModel.onEvent(PersonEvent.OnActiveChanged(newValue))
                             }

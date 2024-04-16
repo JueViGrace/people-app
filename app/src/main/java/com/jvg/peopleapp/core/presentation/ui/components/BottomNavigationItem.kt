@@ -29,11 +29,12 @@ fun RowScope.BottomNavigationItem(
     val selected = currentRoute == tab
 
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         IconButton(
-            modifier = modifier
+            modifier = Modifier
                 .background(
                     color = if (selected) {
                         BottomAppBarDefaults.containerColor

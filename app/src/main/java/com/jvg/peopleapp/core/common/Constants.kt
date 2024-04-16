@@ -12,7 +12,7 @@ object Constants {
     const val MAIN_DISPATCHER = "mainDispatcher"
 
     const val HOME = "Home"
-    const val PEOPLE = "People"
+    const val PEOPLE = "Personas"
 
     val bottomList: List<Tab> = listOf(
         HomeTabs.Dashboard.tab,
