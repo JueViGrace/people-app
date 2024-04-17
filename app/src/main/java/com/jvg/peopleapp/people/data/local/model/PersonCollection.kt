@@ -1,11 +1,12 @@
 package com.jvg.peopleapp.people.data.local.model
 
-import com.jvg.peopleapp.core.common.toStringFormat
+import com.jvg.peopleapp.payments.data.local.model.PaymentCollection
 import com.jvg.peopleapp.people.domain.model.Person
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
 import org.mongodb.kbson.ObjectId
-import java.util.Date
 
 class PersonCollection : RealmObject {
     @PrimaryKey
@@ -15,10 +16,10 @@ class PersonCollection : RealmObject {
     var code: String = ""
     var phone: String = ""
     var email: String = ""
-    var createdAt: String = Date().toStringFormat(1)
     var startsAt: String = ""
     var finishesAt: String = ""
     var active: Boolean = true
+    var paymentCollection: RealmSet<PaymentCollection> = realmSetOf()
 
     fun toDomain(): Person = Person(
         id = _id,
@@ -27,9 +28,9 @@ class PersonCollection : RealmObject {
         code = code,
         phone = phone,
         email = email,
-        createdAt = createdAt,
         startsAt = startsAt,
         finishesAt = finishesAt,
-        active = active
+        active = active,
+        payments = paymentCollection.map { it.toDomain() }.toSet()
     )
 }

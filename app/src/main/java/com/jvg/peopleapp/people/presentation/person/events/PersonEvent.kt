@@ -10,7 +10,6 @@ sealed interface PersonEvent {
     data class OnFinishesAtChanged(val value: String) : PersonEvent
     data class OnActiveChanged(val value: Boolean) : PersonEvent
     data object SavePerson : PersonEvent
-    data object UpdatePerson : PersonEvent
     data object DismissPerson : PersonEvent
     data object DeletePerson : PersonEvent
 }

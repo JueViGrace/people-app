@@ -11,6 +11,8 @@ import com.jvg.peopleapp.people.domain.model.Person
 import com.jvg.peopleapp.people.domain.rules.Validator
 import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
 import com.jvg.peopleapp.people.presentation.person.state.PersonDetailsState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +22,8 @@ import org.mongodb.kbson.ObjectId
 
 class PersonViewModel(
     private val peopleDataSource: PeopleDataSource,
+    private val ioDispatcher: CoroutineDispatcher,
+    private val mainDispatcher: MainCoroutineDispatcher,
     private val id: ObjectId? = null
 ) : ScreenModel {
 
@@ -37,12 +41,12 @@ class PersonViewModel(
                 )
             }
 
-            screenModelScope.launch {
+            screenModelScope.launch(mainDispatcher) {
                 peopleDataSource.getOneById(id).collect { person ->
                     _state.update { personDetailsState ->
                         personDetailsState.copy(
                             person = person,
-                            selectedPerson = if (person.isSuccess()) person.getSuccessData().id else null
+                            selectedPerson = person.getSuccessDataOrNull()?.id
                         )
                     }
                     newPerson = if (person.isSuccess()) person.getSuccessData() else null
@@ -56,7 +60,7 @@ class PersonViewModel(
     fun onEvent(event: PersonEvent) {
         when (event) {
             is PersonEvent.DeletePerson -> {
-                screenModelScope.launch {
+                screenModelScope.launch(ioDispatcher) {
                     _state.value.selectedPerson?.let { id ->
                         peopleDataSource.deletePerson(id)
                     }
@@ -103,7 +107,7 @@ class PersonViewModel(
                 )
             }
             PersonEvent.SavePerson -> {
-                newPerson?.let { person: Person ->
+                newPerson?.let { person ->
                     val result = Validator.validatePerson(person)
                     val errors = listOfNotNull(
                         result.nameError,
@@ -128,8 +132,9 @@ class PersonViewModel(
                                 errors = false
                             )
                         }
-                        screenModelScope.launch {
-                            peopleDataSource.addPerson(person.toDatabase())
+
+                        screenModelScope.launch(ioDispatcher) {
+                            peopleDataSource.addPerson(person)
                         }
                     } else {
                         _state.update { peopleState ->
@@ -149,7 +154,7 @@ class PersonViewModel(
             }
 
             PersonEvent.DismissPerson -> {
-                screenModelScope.launch {
+                screenModelScope.launch(ioDispatcher) {
                     _state.update { peopleState ->
                         peopleState.copy(
                             nameError = null,
@@ -164,52 +169,6 @@ class PersonViewModel(
                         )
                     }
                     newPerson = null
-                }
-            }
-
-            PersonEvent.UpdatePerson -> {
-                newPerson?.let { person: Person ->
-                    val result = Validator.validatePerson(person)
-                    val errors = listOfNotNull(
-                        result.nameError,
-                        result.lastnameError,
-                        result.codeError,
-                        result.phoneError,
-                        result.emailError,
-                        result.startsAtError,
-                        result.finishesAtError
-                    )
-
-                    if (errors.isEmpty()) {
-                        _state.update { personDetailsState ->
-                            personDetailsState.copy(
-                                nameError = null,
-                                lastNameError = null,
-                                codeError = null,
-                                phoneError = null,
-                                emailError = null,
-                                startsAtError = null,
-                                finishesAtError = null,
-                                errors = false
-                            )
-                        }
-                        screenModelScope.launch {
-                            peopleDataSource.updatePerson(person)
-                        }
-                    } else {
-                        _state.update { peopleState ->
-                            peopleState.copy(
-                                nameError = result.nameError,
-                                lastNameError = result.lastnameError,
-                                codeError = result.codeError,
-                                phoneError = result.phoneError,
-                                emailError = result.emailError,
-                                startsAtError = result.startsAtError,
-                                finishesAtError = result.finishesAtError,
-                                errors = true
-                            )
-                        }
-                    }
                 }
             }
         }

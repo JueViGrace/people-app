@@ -2,123 +2,77 @@ package com.jvg.peopleapp.people.data.local.sources
 
 import android.util.Log
 import com.jvg.peopleapp.core.common.Constants.DB_ERROR_MESSAGE
-import com.jvg.peopleapp.core.data.local.LocalDataSource
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.people.data.local.model.PersonCollection
 import com.jvg.peopleapp.people.domain.model.Person
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.exceptions.RealmException
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import org.mongodb.kbson.ObjectId
 
 class PeopleDataSourceImpl(
-    private val localDataSource: LocalDataSource<PersonCollection>,
+    private val realm: Realm,
     private val ioDispatcher: CoroutineDispatcher
 ) : PeopleDataSource {
 
-    override fun getAllPeople(): Flow<RequestState<List<Person>>> = flow {
-        emit(RequestState.Loading)
-
-        localDataSource.findAll().catch { e ->
-            emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
-        }.collect { list ->
-            if (list.isNotEmpty()) {
-                emit(
-                    RequestState.Success(
-                        data = list.map { personCollection -> personCollection.toDomain() }
-                    )
-                )
-            } else {
-                emit(RequestState.Error(message = "There are not people"))
-            }
+    override fun getAllPeople(): Flow<RequestState<List<Person>>> = realm.query<PersonCollection>()
+        .asFlow()
+        .catch { e ->
+            RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE)
         }
-    }.flowOn(ioDispatcher)
-
-    override fun getActivePeople(): Flow<RequestState<List<Person>>> = flow {
-        emit(RequestState.Loading)
-
-        localDataSource.findWithOptions(query = "active == $0", true).catch { e ->
-            emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
-        }.collect { list ->
-            if (list.isNotEmpty()) {
-                emit(
-                    RequestState.Success(
-                        data = list.map { personCollection -> personCollection.toDomain() }
-                    )
-                )
-            } else {
-                emit(RequestState.Error(message = "There are not active people"))
-            }
+        .map { value ->
+            RequestState.Success(value.list.map { it.toDomain() })
         }
-    }.flowOn(ioDispatcher)
+        .flowOn(ioDispatcher)
 
-    override fun getInactivePeople(): Flow<RequestState<List<Person>>> = flow {
-        emit(RequestState.Loading)
-
-        localDataSource.findWithOptions(query = "active == $0", false).catch { e ->
-            emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
-        }.collect { list ->
-            if (list.isNotEmpty()) {
-                emit(
-                    RequestState.Success(
-                        data = list.map { personCollection -> personCollection.toDomain() }
-                    )
-                )
-            } else {
-                emit(RequestState.Error(message = "There are not inactive people"))
+    override fun getActivePeople(): Flow<RequestState<List<Person>>> =
+        realm.query<PersonCollection>(query = "active == $0", true)
+            .asFlow()
+            .catch { e ->
+                RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE)
             }
-        }
-    }.flowOn(ioDispatcher)
-
-    override fun getOneById(id: ObjectId?): Flow<RequestState<Person>> = flow {
-        emit(RequestState.Loading)
-
-        localDataSource.findOneById(id).catch { e ->
-            emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
-        }.collect { pc ->
-            if (pc != null) {
-                emit(
-                    RequestState.Success(
-                        data = pc.toDomain()
-                    )
-                )
-            } else {
-                emit(RequestState.Error(message = "Person doesn't exists"))
+            .map { value ->
+                RequestState.Success(value.list.map { it.toDomain() })
             }
-        }
-    }.flowOn(ioDispatcher)
+            .flowOn(ioDispatcher)
 
-    override suspend fun addPerson(person: PersonCollection) {
-        localDataSource.add(person)
-    }
-
-    override suspend fun updatePerson(person: Person) {
-        val queriedPerson = localDataSource.realm.query<PersonCollection>(
-            query = "_id == $0",
-            person.id
-        ).first().find()
-
-        localDataSource.realm.write {
-            queriedPerson?.let { per ->
-                findLatest(per)?.let { currentPerson ->
-                    currentPerson.name = person.name
-                    currentPerson.lastname = person.lastname
-                    currentPerson.code = person.code
-                    currentPerson.phone = person.phone
-                    currentPerson.email = person.email
-                    currentPerson.startsAt = person.startsAt
-                    currentPerson.finishesAt = person.finishesAt
-                    currentPerson.active = person.active
-                }
+    override fun getInactivePeople(): Flow<RequestState<List<Person>>> =
+        realm.query<PersonCollection>(query = "active == $0", false)
+            .asFlow()
+            .catch { e ->
+                RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE)
             }
+            .map { value ->
+                RequestState.Success(data = value.list.map { it.toDomain() })
+            }
+            .flowOn(ioDispatcher)
+
+    override fun getOneById(id: ObjectId?): Flow<RequestState<Person>> =
+        realm.query<PersonCollection>(query = "_id == $0", id)
+            .find()
+            .asFlow()
+            .catch { e ->
+                RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE)
+            }
+            .map { value ->
+                RequestState.Success(value.list.first().toDomain())
+            }
+            .flowOn(ioDispatcher)
+
+    override suspend fun addPerson(person: Person) {
+        realm.write {
+            copyToRealm(person.toDatabase(), UpdatePolicy.ALL)
         }
     }
 
     override suspend fun setActive(id: ObjectId?, isActive: Boolean) {
-        localDataSource.realm.write {
+        realm.write {
             try {
                 val queriedPerson = query<PersonCollection>(query = "_id == $0", id)
                     .first().find()
@@ -127,7 +81,7 @@ class PeopleDataSourceImpl(
                         active = isActive
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: RealmException) {
                 Log.e("Set active person", "setActive: ${e.message}")
                 e.message
             }
@@ -135,6 +89,19 @@ class PeopleDataSourceImpl(
     }
 
     override suspend fun deletePerson(id: ObjectId?) {
-        localDataSource.delete(id)
+        realm.write {
+            try {
+                val queriedPerson = query<PersonCollection>(query = "_id == $0", id)
+                    .first()
+                    .find()
+                queriedPerson?.let { personCollection ->
+                    findLatest(personCollection)?.let { currentPerson ->
+                        delete(currentPerson)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("Delete person", "deletePerson: $e")
+            }
+        }
     }
 }

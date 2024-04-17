@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
+import com.jvg.peopleapp.core.common.timestampToDate
 import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
@@ -72,7 +73,7 @@ fun PersonComponent(
                     .padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
                 field = "Fecha de creación",
-                value = person.createdAt,
+                value = person.id.timestamp.timestampToDate(1),
                 icon = painterResource(id = R.drawable.ic_calendar_month_24px)
             )
 

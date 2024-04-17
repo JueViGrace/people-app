@@ -31,7 +31,9 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
+import com.jvg.peopleapp.core.common.timestampToDate
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
+import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
 import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
@@ -47,8 +49,6 @@ data class PersonDetailsScreen(val id: ObjectId) : Screen {
 
     @Composable
     override fun Content() {
-        // TODO: CAMBIAR A DETALLES SIN EDICION
-
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<PersonViewModel>(parameters = { parametersOf(id) })
         val state = viewModel.state.collectAsState()
@@ -97,7 +97,9 @@ data class PersonDetailsScreen(val id: ObjectId) : Screen {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Column(
-                                    modifier = Modifier.fillMaxHeight().weight(1f),
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .weight(1f),
                                     verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -144,10 +146,12 @@ data class PersonDetailsScreen(val id: ObjectId) : Screen {
                             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
 
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp),
                                 verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
                                 horizontalAlignment = Alignment.CenterHorizontally
-                            ){
+                            ) {
                                 TextFieldComponent(
                                     modifier = Modifier.fillMaxWidth(),
                                     value = person.code,
@@ -177,7 +181,7 @@ data class PersonDetailsScreen(val id: ObjectId) : Screen {
 
                                 TextFieldComponent(
                                     modifier = Modifier.fillMaxWidth(),
-                                    value = person.createdAt,
+                                    value = person.id.timestamp.timestampToDate(1),
                                     newValue = { _ -> },
                                     icon = R.drawable.ic_calendar_month_24px,
                                     readOnly = true,
@@ -201,6 +205,27 @@ data class PersonDetailsScreen(val id: ObjectId) : Screen {
                                     readOnly = true,
                                     label = "Hora de salida"
                                 )
+                            }
+
+                            if (person.payments.isNotEmpty()) {
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+
+                                person.payments.forEach { payment ->
+                                    CustomClickableCard(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalArrangement = Arrangement.spacedBy(
+                                                5.dp,
+                                                Alignment.CenterVertically
+                                            ),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            CustomText(text = payment.reference)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
