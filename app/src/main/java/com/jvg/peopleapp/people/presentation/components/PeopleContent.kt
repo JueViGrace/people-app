@@ -104,13 +104,13 @@ fun PeopleContent(
                     modifier = modifier
                         .padding(horizontal = 5.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.Top)
+                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
                 ) {
                     items(
                         items = list,
-                        key = { person -> person.id.toString() }
+                        key = { person -> person.id.toHexString() }
                     ) { person ->
-                        PersonComponent(
+                        ListPersonComponent(
                             person = person,
                             showActive = person.active,
                             onSelect = { id ->

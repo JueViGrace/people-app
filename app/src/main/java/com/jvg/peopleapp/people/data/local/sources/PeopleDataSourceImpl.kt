@@ -27,7 +27,11 @@ class PeopleDataSourceImpl(
             RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE)
         }
         .map { value ->
-            RequestState.Success(value.list.map { it.toDomain() })
+            if (value.list.isNotEmpty()) {
+                RequestState.Success(value.list.map { it.toDomain() })
+            } else {
+                RequestState.Error(message = "No existen personas")
+            }
         }
         .flowOn(ioDispatcher)
 

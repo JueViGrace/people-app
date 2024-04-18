@@ -33,7 +33,7 @@ import com.jvg.peopleapp.people.domain.model.Person
 import org.mongodb.kbson.ObjectId
 
 @Composable
-fun PersonComponent(
+fun ListPersonComponent(
     person: Person,
     showActive: Boolean = true,
     onSelect: (ObjectId) -> Unit,
@@ -41,11 +41,8 @@ fun PersonComponent(
     onDelete: (Person) -> Unit
 ) {
     CustomClickableCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp),
         onClick = { onSelect(person.id) },
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(10)
     ) {
         Column(
             modifier = Modifier

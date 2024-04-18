@@ -13,9 +13,11 @@ object Constants {
 
     const val HOME = "Home"
     const val PEOPLE = "Personas"
+    const val PAYMENTS = "Pagos"
 
     val bottomList: List<Tab> = listOf(
         HomeTabs.Dashboard.tab,
         HomeTabs.People.tab,
+        HomeTabs.Payments.tab
     )
 }

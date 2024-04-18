@@ -5,18 +5,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,10 +32,14 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
+import com.jvg.peopleapp.core.common.toStringFormat
+import java.time.LocalDate.now
+import java.time.ZoneId
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePickerComponent(
+fun DatePickerComponent(
     modifier: Modifier = Modifier,
     label: String,
     painterResource: Painter,
@@ -44,23 +52,21 @@ fun TimePickerComponent(
         mutableStateOf(false)
     }
 
-    val state = rememberTimePickerState()
-
-    var hourSelected = when {
-        state.hour < 10 && state.minute < 10 -> {
-            "0${state.hour}:0${state.minute}"
-        }
-        state.hour < 10 -> {
-            "0${state.hour}:${state.minute}"
-        }
-        state.minute < 10 -> {
-            "${state.hour}:0${state.minute}"
-        }
-
-        else -> {
-            "${state.hour}:${state.minute}"
-        }
+    val date by remember {
+        mutableStateOf(now())
     }
+
+    val state = rememberDatePickerState()
+
+    val confirmEnabled by remember { derivedStateOf { state.selectedDateMillis != null } }
+
+    var selectedDate by remember {
+        mutableLongStateOf(
+            date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        )
+    }
+
+    var dateSelected = Date(selectedDate.plus(86400000)).toStringFormat(2)
 
     if (openDialog) {
         BasicAlertDialog(
@@ -82,14 +88,30 @@ fun TimePickerComponent(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TimePicker(state = state)
-                ElevatedButton(
-                    onClick = {
-                        onTextSelected(hourSelected)
-                        openDialog = false
-                    }
+                DatePicker(state = state)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CustomText(text = stringResource(R.string.aceptar))
+                    TextButton(
+                        onClick = { openDialog = false }
+                    ) {
+                        CustomText(text = "Cancel")
+                    }
+
+                    ElevatedButton(
+                        onClick = {
+                            openDialog = false
+                            state.selectedDateMillis?.let {
+                                selectedDate = it
+                            }
+                            onTextSelected(dateSelected)
+                        },
+                        enabled = confirmEnabled
+                    ) {
+                        CustomText(text = stringResource(R.string.aceptar))
+                    }
                 }
             }
         }
@@ -101,8 +123,8 @@ fun TimePickerComponent(
                 .fillMaxWidth(),
             value = value,
             onValueChanged = {
-                hourSelected = it
-                onTextSelected(hourSelected)
+                dateSelected = it
+                onTextSelected(dateSelected)
             },
             label = { CustomText(text = label) },
             leadingIcon = {

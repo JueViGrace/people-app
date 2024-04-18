@@ -1,4 +1,4 @@
-package com.jvg.peopleapp.people.presentation.navigation.screen
+package com.jvg.peopleapp.payments.presentation.navigation.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,12 +19,11 @@ import com.jvg.peopleapp.R
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.home.routes.DetailScreens
-import com.jvg.peopleapp.people.presentation.components.PeopleContent
-import com.jvg.peopleapp.people.presentation.events.PeopleEvents
-import com.jvg.peopleapp.people.presentation.viewmodel.PeopleViewModel
+import com.jvg.peopleapp.payments.presentation.components.PaymentsContent
+import com.jvg.peopleapp.payments.presentation.viewmodel.PaymentsViewModel
 
-object PeopleScreen : Screen {
-    private fun readResolve(): Any = PeopleScreen
+object PaymentsScreen : Screen {
+    private fun readResolve(): Any = PaymentsScreen
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -32,10 +31,8 @@ object PeopleScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val tabNavigator = LocalTabNavigator.current
-        val viewModel = getScreenModel<PeopleViewModel>()
+        val viewModel = getScreenModel<PaymentsViewModel>()
         val state by viewModel.state.collectAsState()
-
-        // TODO: FILTER ICON IN TOP BAR
 
         Scaffold(
             topBar = {
@@ -47,30 +44,22 @@ object PeopleScreen : Screen {
             floatingActionButton = {
                 FABComponent(
                     onAdd = {
-                        navigator.push(
-                            DetailScreens.CreatePerson().screen
-                        )
+                        navigator.push(DetailScreens.CreatePayment().screen)
                     },
                     icon = painterResource(id = R.drawable.ic_add_24px)
                 )
             }
         ) { innerPadding ->
-            PeopleContent(
+            PaymentsContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
                         top = innerPadding.calculateTopPadding(),
                         bottom = innerPadding.calculateBottomPadding()
                     ),
-                people = state.people,
+                payments = state.payments,
                 onSelect = { id ->
-                    navigator.push(DetailScreens.PersonDetails(id).screen)
-                },
-                onActive = { id, isActive: Boolean ->
-                    viewModel.onEvent(PeopleEvents.OnSetActive(id, isActive))
-                },
-                onDelete = { id ->
-                    viewModel.onEvent(PeopleEvents.OnDeletePerson(id))
+                    navigator.push(DetailScreens.PaymentDetails(id).screen)
                 }
             )
         }

@@ -7,8 +7,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.jvg.peopleapp.home.routes.BottomNavItem
 import com.jvg.peopleapp.home.routes.HomeScreens
+import com.jvg.peopleapp.home.routes.HomeTabs
 
 object PeopleTab : Tab {
     private fun readResolve(): Any = PeopleTab
@@ -16,11 +16,11 @@ object PeopleTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val icon = painterResource(id = BottomNavItem.PeopleTab.icon)
+            val icon = painterResource(id = HomeTabs.People.icon)
             return remember {
                 TabOptions(
-                    index = BottomNavItem.PeopleTab.index,
-                    title = BottomNavItem.PeopleTab.title,
+                    index = HomeTabs.People.index,
+                    title = HomeTabs.People.title,
                     icon = icon
                 )
             }

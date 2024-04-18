@@ -42,14 +42,14 @@ class PersonViewModel(
             }
 
             screenModelScope.launch(mainDispatcher) {
-                peopleDataSource.getOneById(id).collect { person ->
+                peopleDataSource.getOneById(id).collect { value ->
                     _state.update { personDetailsState ->
                         personDetailsState.copy(
-                            person = person,
-                            selectedPerson = person.getSuccessDataOrNull()?.id
+                            person = value,
+                            selectedPerson = value.getSuccessDataOrNull()?.id
                         )
                     }
-                    newPerson = if (person.isSuccess()) person.getSuccessData() else null
+                    newPerson = value.getSuccessDataOrNull()
                 }
             }
         } else {
