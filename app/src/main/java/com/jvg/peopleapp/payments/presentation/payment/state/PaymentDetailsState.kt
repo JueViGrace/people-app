@@ -9,6 +9,7 @@ data class PaymentDetailsState(
     val payment: RequestState<Payment> = RequestState.Loading,
     val people: RequestState<List<Person>> = RequestState.Idle,
     val selectedPayment: ObjectId? = null,
+    val paymentMethodError: String? = null,
     val referenceError: String? = null,
     val bankError: String? = null,
     val holderCodeError: String? = null,

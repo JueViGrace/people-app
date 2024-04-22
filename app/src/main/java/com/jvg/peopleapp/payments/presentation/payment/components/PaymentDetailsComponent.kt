@@ -17,6 +17,7 @@ import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
 import com.jvg.peopleapp.payments.domain.model.Payment
+import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 import org.mongodb.kbson.ObjectId
 
 @Composable
@@ -28,7 +29,7 @@ fun PaymentDetailsComponent(
     Scaffold(
         topBar = {
             AppBar(
-                title = "${payment.bank}: ${payment.reference}",
+                title = "Pago de: ${payment.person?.name} ${payment.person?.lastname}",
                 icon = rememberVectorPainter(Icons.AutoMirrored.Default.ArrowBack),
                 onClick = popBack
             )
@@ -53,18 +54,20 @@ fun PaymentDetailsComponent(
         ) {
             item {
                 CustomClickableCard {
-                    RowComponent(
-                        modifier = Modifier.fillMaxWidth(),
-                        field = "Banco",
-                        value = payment.bank,
-                        icon = painterResource(R.drawable.ic_account_balance_24px)
-                    )
-                    RowComponent(
-                        modifier = Modifier.fillMaxWidth(),
-                        field = "Referencia",
-                        value = payment.reference,
-                        icon = painterResource(R.drawable.ic_checkbook_24px)
-                    )
+                    if (payment.paymentMethod == PaymentMethods.Transfer.method){
+                        RowComponent(
+                            modifier = Modifier.fillMaxWidth(),
+                            field = "Banco",
+                            value = payment.bank ?: "",
+                            icon = painterResource(R.drawable.ic_account_balance_24px)
+                        )
+                        RowComponent(
+                            modifier = Modifier.fillMaxWidth(),
+                            field = "Referencia",
+                            value = payment.reference ?: "",
+                            icon = painterResource(R.drawable.ic_checkbook_24px)
+                        )
+                    }
                 }
             }
         }

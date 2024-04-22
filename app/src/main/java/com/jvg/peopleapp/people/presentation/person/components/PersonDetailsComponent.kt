@@ -197,7 +197,8 @@ fun PersonDetailsComponent(
                                 ),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CustomText(text = payment.reference)
+                                CustomText(text = payment.id.toHexString())
+                                CustomText(text = payment.paymentMethod)
                             }
                         }
                     }

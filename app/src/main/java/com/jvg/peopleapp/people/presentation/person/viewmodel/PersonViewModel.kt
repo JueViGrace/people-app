@@ -8,11 +8,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.people.domain.model.Person
-import com.jvg.peopleapp.people.domain.rules.Validator
+import com.jvg.peopleapp.people.domain.rules.PersonValidator
 import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
 import com.jvg.peopleapp.people.presentation.person.state.PersonDetailsState
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,8 +21,6 @@ import org.mongodb.kbson.ObjectId
 
 class PersonViewModel(
     private val peopleDataSource: PeopleDataSource,
-    private val ioDispatcher: CoroutineDispatcher,
-    private val mainDispatcher: MainCoroutineDispatcher,
     private val id: ObjectId? = null
 ) : ScreenModel {
 
@@ -41,7 +38,7 @@ class PersonViewModel(
                 )
             }
 
-            screenModelScope.launch(mainDispatcher) {
+            screenModelScope.launch {
                 peopleDataSource.getOneById(id).collect { value ->
                     _state.update { personDetailsState ->
                         personDetailsState.copy(
@@ -60,7 +57,7 @@ class PersonViewModel(
     fun onEvent(event: PersonEvent) {
         when (event) {
             is PersonEvent.DeletePerson -> {
-                screenModelScope.launch(ioDispatcher) {
+                screenModelScope.launch(Dispatchers.IO) {
                     _state.value.selectedPerson?.let { id ->
                         peopleDataSource.deletePerson(id)
                     }
@@ -108,7 +105,7 @@ class PersonViewModel(
             }
             PersonEvent.SavePerson -> {
                 newPerson?.let { person ->
-                    val result = Validator.validatePerson(person)
+                    val result = PersonValidator.validatePerson(person)
                     val errors = listOfNotNull(
                         result.nameError,
                         result.lastnameError,
@@ -133,7 +130,7 @@ class PersonViewModel(
                             )
                         }
 
-                        screenModelScope.launch(ioDispatcher) {
+                        screenModelScope.launch(Dispatchers.IO) {
                             peopleDataSource.addPerson(person)
                         }
                     } else {
@@ -154,22 +151,20 @@ class PersonViewModel(
             }
 
             PersonEvent.DismissPerson -> {
-                screenModelScope.launch(ioDispatcher) {
-                    _state.update { peopleState ->
-                        peopleState.copy(
-                            nameError = null,
-                            lastNameError = null,
-                            codeError = null,
-                            phoneError = null,
-                            emailError = null,
-                            startsAtError = null,
-                            finishesAtError = null,
-                            selectedPerson = null,
-                            errors = null
-                        )
-                    }
-                    newPerson = null
+                _state.update { peopleState ->
+                    peopleState.copy(
+                        nameError = null,
+                        lastNameError = null,
+                        codeError = null,
+                        phoneError = null,
+                        emailError = null,
+                        startsAtError = null,
+                        finishesAtError = null,
+                        selectedPerson = null,
+                        errors = null
+                    )
                 }
+                newPerson = null
             }
         }
     }

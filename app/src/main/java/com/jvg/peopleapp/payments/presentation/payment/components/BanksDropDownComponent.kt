@@ -1,4 +1,4 @@
-package com.jvg.peopleapp.people.presentation.components
+package com.jvg.peopleapp.payments.presentation.payment.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,16 +32,16 @@ import androidx.compose.ui.unit.toSize
 import com.jvg.peopleapp.R
 import com.jvg.peopleapp.core.presentation.ui.components.CustomOutlinedTextField
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
-import com.jvg.peopleapp.people.domain.model.Person
+import com.jvg.peopleapp.payments.domain.model.Banks
 
 @Composable
-fun PeopleDropDownComponent(
+fun BanksDropDownComponent(
     modifier: Modifier = Modifier,
     label: String,
     placeholder: String,
     painter: Painter? = null,
-    people: List<Person>,
-    onValueChanged: (Person) -> Unit,
+    items: List<Banks>,
+    onValueChanged: (Banks) -> Unit,
     supportingText: String? = null,
     errorStatus: Boolean = false
 ) {
@@ -49,7 +49,7 @@ fun PeopleDropDownComponent(
         mutableStateOf(false)
     }
 
-    var selectedPerson by remember {
+    var selectedBank by remember {
         mutableStateOf("")
     }
 
@@ -71,9 +71,9 @@ fun PeopleDropDownComponent(
                     textFieldSize = coordinates.size.toSize()
                 }
                 .padding(horizontal = 5.dp),
-            value = selectedPerson,
+            value = selectedBank,
             onValueChanged = {
-                selectedPerson = it
+                selectedBank = it
             },
             label = { CustomText(text = label) },
             placeholder = { CustomText(text = placeholder) },
@@ -115,7 +115,7 @@ fun PeopleDropDownComponent(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            people.forEach { person ->
+            items.forEach { item ->
                 DropdownMenuItem(
                     text = {
                         Row(
@@ -127,15 +127,15 @@ fun PeopleDropDownComponent(
                                 contentDescription = ""
                             )
                             CustomText(
-                                text = "${person.name} ${person.lastname}",
+                                text = item.name,
                                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                     },
                     onClick = {
-                        selectedPerson = "${person.name} ${person.lastname}"
-                        onValueChanged(person)
+                        selectedBank = item.name
+                        onValueChanged(item)
                         expanded = false
                     }
                 )

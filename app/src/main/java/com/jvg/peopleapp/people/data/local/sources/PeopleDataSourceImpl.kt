@@ -9,7 +9,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.exceptions.RealmException
 import io.realm.kotlin.ext.query
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
@@ -17,8 +17,7 @@ import kotlinx.coroutines.flow.map
 import org.mongodb.kbson.ObjectId
 
 class PeopleDataSourceImpl(
-    private val realm: Realm,
-    private val ioDispatcher: CoroutineDispatcher
+    private val realm: Realm
 ) : PeopleDataSource {
 
     override fun getAllPeople(): Flow<RequestState<List<Person>>> = realm.query<PersonCollection>()
@@ -33,7 +32,7 @@ class PeopleDataSourceImpl(
                 RequestState.Error(message = "No existen personas")
             }
         }
-        .flowOn(ioDispatcher)
+        .flowOn(Dispatchers.IO)
 
     override fun getActivePeople(): Flow<RequestState<List<Person>>> =
         realm.query<PersonCollection>(query = "active == $0", true)
@@ -44,7 +43,7 @@ class PeopleDataSourceImpl(
             .map { value ->
                 RequestState.Success(value.list.map { it.toDomain() })
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override fun getInactivePeople(): Flow<RequestState<List<Person>>> =
         realm.query<PersonCollection>(query = "active == $0", false)
@@ -55,7 +54,7 @@ class PeopleDataSourceImpl(
             .map { value ->
                 RequestState.Success(data = value.list.map { it.toDomain() })
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override fun getOneById(id: ObjectId?): Flow<RequestState<Person>> =
         realm.query<PersonCollection>(query = "_id == $0", id)
@@ -67,7 +66,7 @@ class PeopleDataSourceImpl(
             .map { value ->
                 RequestState.Success(value.list.first().toDomain())
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override suspend fun addPerson(person: Person) {
         realm.write {

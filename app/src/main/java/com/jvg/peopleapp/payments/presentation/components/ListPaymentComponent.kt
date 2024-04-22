@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,6 +18,7 @@ import com.jvg.peopleapp.core.common.timestampToDate
 import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
 import com.jvg.peopleapp.payments.domain.model.Payment
+import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 import org.mongodb.kbson.ObjectId
 
 @Composable
@@ -29,8 +29,7 @@ fun ListPaymentComponent(
     CustomClickableCard(
         onClick = {
             onSelect(payment.id)
-        },
-        shape = RoundedCornerShape(10)
+        }
     ) {
         Column(
             modifier = Modifier
@@ -81,22 +80,36 @@ fun ListPaymentComponent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RowComponent(
-                            icon = painterResource(id = R.drawable.ic_checkbook_24px),
-                            field = "Referencia",
-                            value = payment.reference
+                            icon = painterResource(id = R.drawable.ic_receipt_24px),
+                            field = "Método de pago",
+                            value = payment.paymentMethod
                         )
 
                         RowComponent(
-                            icon = painterResource(id = R.drawable.ic_account_balance_24px),
-                            field = "Banco",
-                            value = payment.bank
+                            icon = painterResource(id = R.drawable.ic_attach_money_24px),
+                            field = "Cantidad",
+                            value = payment.amount.toString()
                         )
                     }
-                    RowComponent(
-                        icon = painterResource(id = R.drawable.ic_attach_money_24px),
-                        field = "Cantidad",
-                        value = payment.amount.toString()
-                    )
+                    if (payment.paymentMethod == PaymentMethods.Transfer.method) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RowComponent(
+                                icon = painterResource(id = R.drawable.ic_checkbook_24px),
+                                field = "Referencia",
+                                value = payment.reference ?: ""
+                            )
+
+                            RowComponent(
+                                icon = painterResource(id = R.drawable.ic_account_balance_24px),
+                                field = "Banco",
+                                value = payment.bank ?: ""
+                            )
+                        }
+                    }
                 }
             }
 
@@ -110,7 +123,7 @@ fun ListPaymentComponent(
                 ) {
                     RowComponent(
                         icon = painterResource(id = R.drawable.ic_person_24px),
-                        field = "Pertenece a",
+                        field = "Pago de",
                         value = "${payment.person.name} ${payment.person.lastname}"
                     )
 

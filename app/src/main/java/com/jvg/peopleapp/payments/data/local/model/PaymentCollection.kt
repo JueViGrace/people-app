@@ -9,9 +9,10 @@ import org.mongodb.kbson.ObjectId
 class PaymentCollection : RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
-    var reference: String = ""
-    var bank: String = ""
-    var holderCode: String = ""
+    var paymentMethod: String = ""
+    var reference: String? = ""
+    var bank: String? = null
+    var holderCode: String? = ""
     var amount: Double = 0.0
     var madeAt: String = ""
     var note: String = ""
@@ -19,6 +20,7 @@ class PaymentCollection : RealmObject {
 
     fun toDomain(): Payment = Payment(
         id = _id,
+        paymentMethod = paymentMethod,
         reference = reference,
         bank = bank,
         holderCode = holderCode,

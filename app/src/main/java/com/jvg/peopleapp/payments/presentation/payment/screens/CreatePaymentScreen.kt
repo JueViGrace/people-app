@@ -1,8 +1,10 @@
 package com.jvg.peopleapp.payments.presentation.payment.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -28,11 +29,16 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
+import com.jvg.peopleapp.core.common.Constants.banksList
+import com.jvg.peopleapp.core.common.Constants.paymentMethodsList
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
 import com.jvg.peopleapp.core.presentation.ui.components.CustomOutlinedTextField
 import com.jvg.peopleapp.core.presentation.ui.components.DatePickerComponent
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.TextFieldComponent
+import com.jvg.peopleapp.payments.domain.model.PaymentMethods
+import com.jvg.peopleapp.payments.presentation.payment.components.BanksDropDownComponent
+import com.jvg.peopleapp.payments.presentation.payment.components.PaymentMethodsRadioComponent
 import com.jvg.peopleapp.payments.presentation.payment.events.PaymentEvents
 import com.jvg.peopleapp.payments.presentation.payment.viewmodel.PaymentViewModel
 import com.jvg.peopleapp.people.presentation.components.PeopleDropDownComponent
@@ -53,14 +59,15 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
         val editPayment = viewModel.newPayment
 
         val topBarTitle = if (
-            editPayment?.bank?.isNotEmpty() == true && editPayment.reference.isNotEmpty()
+            editPayment?.person != null
         ) {
-            "${editPayment.bank}: ${editPayment.reference}"
+            "Pago de: ${editPayment.person.name} ${editPayment.person.lastname}"
         } else {
             "Cree un nuevo pago"
         }
 
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
                 AppBar(
                     title = topBarTitle,
@@ -102,63 +109,67 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
                         contentDescription = "Receipt"
                     )
 
-                    TextFieldComponent(
+                    PaymentMethodsRadioComponent(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 5.dp),
-                        value = editPayment?.reference ?: "",
-                        newValue = { newValue ->
-                            viewModel.onEvent(PaymentEvents.OnReferenceChanged(newValue))
-                        },
-                        label = "Referencia",
-                        placeholder = "Referencia bancaria...",
-                        supportingText = state.referenceError,
-                        errorStatus = state.referenceError?.isNotEmpty() ?: false,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Text
-                        ),
-                        icon = R.drawable.ic_checkbook_24px
+                            .padding(horizontal = 10.dp),
+                        paymentMethods = paymentMethodsList,
+                        onValueChanged = { method ->
+                            viewModel.onEvent(PaymentEvents.OnPaymentMethodChanged(method))
+                        }
                     )
 
-                    TextFieldComponent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 5.dp),
-                        value = editPayment?.bank ?: "",
-                        newValue = { newValue ->
-                            viewModel.onEvent(PaymentEvents.OnBankChanged(newValue))
-                        },
-                        label = "Banco",
-                        placeholder = "Banco...",
-                        supportingText = state.bankError,
-                        errorStatus = state.bankError?.isNotEmpty() ?: false,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Text,
-                            capitalization = KeyboardCapitalization.Words
-                        ),
-                        icon = R.drawable.ic_account_balance_24px
-                    )
+                    if (editPayment?.paymentMethod == PaymentMethods.Transfer.method) {
+                        TextFieldComponent(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 5.dp),
+                            value = editPayment?.reference ?: "",
+                            newValue = { newValue ->
+                                viewModel.onEvent(PaymentEvents.OnReferenceChanged(newValue))
+                            },
+                            label = "Referencia",
+                            placeholder = "Referencia bancaria...",
+                            supportingText = state.referenceError,
+                            errorStatus = state.referenceError?.isNotEmpty() ?: false,
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            icon = R.drawable.ic_checkbook_24px
+                        )
 
-                    TextFieldComponent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 5.dp),
-                        value = editPayment?.holderCode ?: "",
-                        newValue = { newValue ->
-                            viewModel.onEvent(PaymentEvents.OnHolderCodeChanged(newValue))
-                        },
-                        label = "Cédula",
-                        placeholder = "Cédula del titular de la cuenta...",
-                        supportingText = state.holderCodeError,
-                        errorStatus = state.holderCodeError?.isNotEmpty() ?: false,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Text
-                        ),
-                        icon = R.drawable.ic_id_card_24px
-                    )
+                        BanksDropDownComponent(
+                            label = "Bancos",
+                            placeholder = "Seleccione un banco...",
+                            items = banksList,
+                            onValueChanged = { newValue ->
+                                viewModel.onEvent(PaymentEvents.OnBankChanged(newValue))
+                            },
+                            painter = painterResource(id = R.drawable.ic_account_balance_24px),
+                            supportingText = state.bankError,
+                            errorStatus = state.bankError?.isNotEmpty() ?: false
+                        )
+
+                        TextFieldComponent(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 5.dp),
+                            value = editPayment?.holderCode ?: "",
+                            newValue = { newValue ->
+                                viewModel.onEvent(PaymentEvents.OnHolderCodeChanged(newValue))
+                            },
+                            label = "Cédula",
+                            placeholder = "Cédula del titular de la cuenta...",
+                            supportingText = state.holderCodeError,
+                            errorStatus = state.holderCodeError?.isNotEmpty() ?: false,
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next,
+                                keyboardType = KeyboardType.Number
+                            ),
+                            icon = R.drawable.ic_id_card_24px
+                        )
+                    }
 
                     TextFieldComponent(
                         modifier = Modifier
@@ -241,6 +252,10 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
                             )
                         },
                     )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(70.dp))
                 }
             }
         }

@@ -31,6 +31,6 @@ class PersonCollection : RealmObject {
         startsAt = startsAt,
         finishesAt = finishesAt,
         active = active,
-        payments = paymentCollection.map { it.toDomain() }.toSet()
+        payments = paymentCollection.map { it.toDomain() }.toList()
     )
 }

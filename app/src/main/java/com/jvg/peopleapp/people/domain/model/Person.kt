@@ -2,7 +2,6 @@ package com.jvg.peopleapp.people.domain.model
 
 import com.jvg.peopleapp.payments.domain.model.Payment
 import com.jvg.peopleapp.people.data.local.model.PersonCollection
-import io.realm.kotlin.ext.toRealmSet
 import org.mongodb.kbson.ObjectId
 
 data class Person(
@@ -15,7 +14,7 @@ data class Person(
     val startsAt: String = "",
     val finishesAt: String = "",
     val active: Boolean = true,
-    val payments: Set<Payment> = emptySet()
+    val payments: List<Payment> = emptyList()
 ) {
     fun toDatabase(): PersonCollection = PersonCollection().apply {
         _id = this@Person.id
@@ -27,6 +26,5 @@ data class Person(
         startsAt = this@Person.startsAt
         finishesAt = this@Person.finishesAt
         active = this@Person.active
-        paymentCollection = this@Person.payments.map { it.toDatabase() }.toRealmSet()
     }
 }

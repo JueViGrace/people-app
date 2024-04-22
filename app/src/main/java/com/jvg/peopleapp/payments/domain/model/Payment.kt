@@ -6,9 +6,10 @@ import org.mongodb.kbson.ObjectId
 
 data class Payment(
     var id: ObjectId = ObjectId(),
-    val reference: String = "",
-    val bank: String = "",
-    val holderCode: String = "",
+    val paymentMethod: String = "",
+    val reference: String? = "",
+    val bank: String? = null,
+    val holderCode: String? = "",
     val amount: Double = 0.0,
     val madeAt: String = "",
     val note: String = "",
@@ -16,12 +17,13 @@ data class Payment(
 ) {
     fun toDatabase(): PaymentCollection = PaymentCollection().apply {
         _id = this@Payment.id
+        paymentMethod = this@Payment.paymentMethod
         reference = this@Payment.reference
         bank = this@Payment.bank
         holderCode = this@Payment.holderCode
         amount = this@Payment.amount
         madeAt = this@Payment.madeAt
         note = this@Payment.note
-        personCollection = person?.toDatabase()
+        personCollection = this@Payment.person?.toDatabase()
     }
 }

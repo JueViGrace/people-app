@@ -1,6 +1,8 @@
 package com.jvg.peopleapp.payments.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,7 +34,7 @@ fun PaymentsContent(
                 LazyColumn(
                     modifier = modifier.padding(horizontal = 5.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.Top)
+                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
                 ) {
                     items(
                         items = list,
@@ -44,6 +46,10 @@ fun PaymentsContent(
                                 onSelect?.invoke(id)
                             }
                         )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(70.dp))
                     }
                 }
             } else {

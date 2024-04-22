@@ -5,9 +5,11 @@ import com.jvg.peopleapp.core.common.Constants.DB_ERROR_MESSAGE
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.payments.data.local.model.PaymentCollection
 import com.jvg.peopleapp.payments.domain.model.Payment
+import com.jvg.peopleapp.people.data.local.model.PersonCollection
 import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
@@ -16,7 +18,6 @@ import org.mongodb.kbson.ObjectId
 
 class PaymentsDataSourceImpl(
     private val realm: Realm,
-    private val ioDispatcher: CoroutineDispatcher
 ) : PaymentsDataSource {
     override fun getAllPayments(): Flow<RequestState<List<Payment>>> =
         realm.query<PaymentCollection>()
@@ -29,7 +30,7 @@ class PaymentsDataSourceImpl(
                     data = value.list.map { it.toDomain() }
                 )
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override fun getPaymentById(id: ObjectId): Flow<RequestState<Payment>> =
         realm.query<PaymentCollection>(query = "_id == $0", id)
@@ -41,7 +42,7 @@ class PaymentsDataSourceImpl(
             .map { value ->
                 RequestState.Success(value.list.first().toDomain())
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override fun getPaymentsByPerson(id: ObjectId): Flow<RequestState<List<Payment>>> =
         realm.query<PaymentCollection>(query = "personCollection._id == $0", id)
@@ -53,7 +54,7 @@ class PaymentsDataSourceImpl(
             .map { value ->
                 RequestState.Success(value.list.map { it.toDomain() })
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override fun getPaymentsWithOptions(
         query: String,
@@ -69,11 +70,31 @@ class PaymentsDataSourceImpl(
                     data = value.list.map { it.toDomain() }
                 )
             }
-            .flowOn(ioDispatcher)
+            .flowOn(Dispatchers.IO)
 
     override suspend fun addPayment(payment: Payment) {
         realm.write {
-            copyToRealm(payment.toDatabase())
+            val queriedPerson = realm.query<PersonCollection>(query = "_id == $0", payment.person?.id)
+                .find()
+                .first()
+
+            findLatest(queriedPerson)?.paymentCollection?.add(
+                PaymentCollection().apply {
+                    _id = payment.id
+                    paymentMethod = payment.paymentMethod
+                    reference = payment.reference
+                    bank = payment.bank
+                    holderCode = payment.holderCode
+                    amount = payment.amount
+                    madeAt = payment.madeAt
+                    note = payment.note
+                }
+            )
+
+            copyToRealm(
+                payment.toDatabase(),
+                updatePolicy = UpdatePolicy.ALL
+            )
         }
     }
 

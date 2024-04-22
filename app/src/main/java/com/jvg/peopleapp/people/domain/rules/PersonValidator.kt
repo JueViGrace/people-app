@@ -1,13 +1,12 @@
 package com.jvg.peopleapp.people.domain.rules
 
 import android.util.Patterns
-import com.jvg.peopleapp.core.common.Constants.CODE_LENGTH
 import com.jvg.peopleapp.core.common.Constants.PHONE_LENGTH
 import com.jvg.peopleapp.people.domain.model.Person
 
-object Validator {
-    fun validatePerson(person: Person): ValidationResult {
-        var result = ValidationResult()
+object PersonValidator {
+    fun validatePerson(person: Person): PersonValidationResult {
+        var result = PersonValidationResult()
 
         if (person.name.isBlank()) {
             result = result.copy(nameError = "Nombre no puede estar vacío")
@@ -23,8 +22,6 @@ object Validator {
 
         if (person.code.isBlank()) {
             result = result.copy(codeError = "Cédula no puede estar vacío")
-        } else if (person.code.length > CODE_LENGTH) {
-            result = result.copy(codeError = "Cédula debe tener 8 caracteres o menos")
         }
 
         if (person.phone.length < PHONE_LENGTH) {
@@ -42,7 +39,7 @@ object Validator {
         return result
     }
 
-    data class ValidationResult(
+    data class PersonValidationResult(
         val nameError: String? = null,
         val lastnameError: String? = null,
         val emailError: String? = null,

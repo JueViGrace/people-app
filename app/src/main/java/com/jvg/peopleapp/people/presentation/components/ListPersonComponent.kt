@@ -41,8 +41,7 @@ fun ListPersonComponent(
     onDelete: (Person) -> Unit
 ) {
     CustomClickableCard(
-        onClick = { onSelect(person.id) },
-        shape = RoundedCornerShape(10)
+        onClick = { onSelect(person.id) }
     ) {
         Column(
             modifier = Modifier
