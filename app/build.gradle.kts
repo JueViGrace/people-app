@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.realmKotlin)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 android {
@@ -42,7 +43,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
+        kotlinCompilerExtensionVersion = "1.5.12"
     }
     packaging {
         resources {
@@ -105,4 +106,16 @@ dependencies {
 
     // Realm
     implementation(libs.realm.base)
+
+    // Sqldelight
+    implementation(libs.sqldelight)
+    implementation(kotlin("reflect"))
+}
+
+sqldelight {
+    databases {
+        create("SelfManagerDB") {
+            packageName.set("com.jvg.peopleapp")
+        }
+    }
 }

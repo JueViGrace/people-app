@@ -9,9 +9,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.tab.CurrentTab
+import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.jvg.peopleapp.core.common.Constants.bottomList
 import com.jvg.peopleapp.core.presentation.ui.components.BottomBarComponent
 import com.jvg.peopleapp.home.routes.HomeTabs
 
@@ -22,6 +22,7 @@ object HomeNavigator : Screen {
 
     @Composable
     override fun Content() {
+        val bottomList = HomeTabs::class.sealedSubclasses.map { it.objectInstance?.tab as Tab }
         TabNavigator(
             tab = HomeTabs.Dashboard.tab,
             tabDisposable = { tabNavigator ->
@@ -33,19 +34,6 @@ object HomeNavigator : Screen {
                 bottomBar = {
                     BottomBarComponent(
                         tabNavigator
-                            /*onAdd = {
-                                peopleViewModel.onEvent(PersonEvent.OnAddNewPerson)
-                                navigator.push(DetailScreens.CreatePerson(peopleViewModel.newPerson).screen)
-                            },
-                            icon = when (tabNavigator.current) {
-                                HomeTabs.People.tab -> {
-                                    rememberVectorPainter(image = Icons.Default.Edit)
-                                }
-
-                                else -> {
-                                    rememberVectorPainter(image = Icons.Default.Add)
-                                }
-                            }*/
                     )
                 },
                 content = { paddingValues ->

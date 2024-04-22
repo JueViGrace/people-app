@@ -18,13 +18,12 @@ import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
 import com.jvg.peopleapp.payments.domain.model.Payment
 import com.jvg.peopleapp.payments.domain.model.PaymentMethods
-import org.mongodb.kbson.ObjectId
 
 @Composable
 fun PaymentDetailsComponent(
     payment: Payment,
     popBack: () -> Unit,
-    onAdd: (ObjectId) -> Unit,
+    onAdd: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {

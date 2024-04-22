@@ -25,19 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.core.common.timestampToDate
 import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
 import com.jvg.peopleapp.people.domain.model.Person
-import org.mongodb.kbson.ObjectId
 
 @Composable
 fun ListPersonComponent(
     person: Person,
     showActive: Boolean = true,
-    onSelect: (ObjectId) -> Unit,
-    onActive: (ObjectId?, Boolean) -> Unit,
+    onSelect: (String) -> Unit,
+    onActive: (String?, Boolean) -> Unit,
     onDelete: (Person) -> Unit
 ) {
     CustomClickableCard(
@@ -60,7 +58,7 @@ fun ListPersonComponent(
                 ),
                 icon = painterResource(id = R.drawable.ic_fingerprint_24px),
                 field = "Id",
-                value = person.id.toHexString()
+                value = person.id
             )
 
             RowComponent(
@@ -69,7 +67,7 @@ fun ListPersonComponent(
                     .padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
                 field = "Fecha de creación",
-                value = person.id.timestamp.timestampToDate(1),
+                value = person.createdAt,
                 icon = painterResource(id = R.drawable.ic_calendar_month_24px)
             )
 

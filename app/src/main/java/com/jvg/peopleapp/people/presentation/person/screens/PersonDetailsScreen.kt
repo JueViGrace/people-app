@@ -17,7 +17,7 @@ import com.jvg.peopleapp.people.presentation.person.viewmodel.PersonViewModel
 import org.koin.core.parameter.parametersOf
 import org.mongodb.kbson.ObjectId
 
-data class PersonDetailsScreen(val id: ObjectId) : Screen {
+data class PersonDetailsScreen(val id: String) : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @Composable

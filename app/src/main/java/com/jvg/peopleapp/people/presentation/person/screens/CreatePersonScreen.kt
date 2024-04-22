@@ -40,7 +40,7 @@ import org.koin.core.parameter.emptyParametersHolder
 import org.koin.core.parameter.parametersOf
 import org.mongodb.kbson.ObjectId
 
-data class CreatePersonScreen(val id: ObjectId? = null) : Screen {
+data class CreatePersonScreen(val id: String? = null) : Screen {
 
     @Composable
     override fun Content() {

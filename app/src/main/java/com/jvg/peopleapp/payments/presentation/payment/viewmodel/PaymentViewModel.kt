@@ -18,12 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
 
 class PaymentViewModel(
     private val paymentsDataSource: PaymentsDataSource,
     private val peopleDataSource: PeopleDataSource,
-    private val id: ObjectId? = null
+    private val id: String? = null
 ) : ScreenModel {
     private var _state: MutableStateFlow<PaymentDetailsState> = MutableStateFlow(PaymentDetailsState())
     val state: StateFlow<PaymentDetailsState> = _state.asStateFlow()

@@ -1,11 +1,12 @@
 package com.jvg.peopleapp.people.domain.model
 
+import com.jvg.peopleapp.core.common.toCustomDateFormat
 import com.jvg.peopleapp.payments.domain.model.Payment
-import com.jvg.peopleapp.people.data.local.model.PersonCollection
-import org.mongodb.kbson.ObjectId
+import com.jvg.peopleapp.people.data.local.model.PersonEntity
+import java.util.UUID
 
 data class Person(
-    val id: ObjectId = ObjectId(),
+    val id: String = UUID.randomUUID().toString(),
     val name: String = "",
     val lastname: String = "",
     val code: String = "",
@@ -14,17 +15,21 @@ data class Person(
     val startsAt: String = "",
     val finishesAt: String = "",
     val active: Boolean = true,
+    val createdAt: String = "",
+    val updatedAt: String = "",
+    val deletedAt: String? = null,
     val payments: List<Payment> = emptyList()
 ) {
-    fun toDatabase(): PersonCollection = PersonCollection().apply {
-        _id = this@Person.id
-        name = this@Person.name
-        lastname = this@Person.lastname
-        code = this@Person.code
-        phone = this@Person.phone
-        email = this@Person.email
-        startsAt = this@Person.startsAt
-        finishesAt = this@Person.finishesAt
-        active = this@Person.active
-    }
+    fun toDatabase(): PersonEntity = PersonEntity(
+        id = id,
+        name = name,
+        lastname = lastname,
+        code = code,
+        phone = phone,
+        email = email,
+        startsAt = startsAt.toCustomDateFormat(),
+        finishesAt = finishesAt.toCustomDateFormat(),
+        active = active,
+        payments = payments.map { it.toDatabase() }
+    )
 }

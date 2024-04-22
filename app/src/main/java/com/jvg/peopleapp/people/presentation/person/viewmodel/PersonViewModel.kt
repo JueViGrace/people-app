@@ -17,11 +17,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
 
 class PersonViewModel(
     private val peopleDataSource: PeopleDataSource,
-    private val id: ObjectId? = null
+    private val id: String? = null
 ) : ScreenModel {
 
     private var _state: MutableStateFlow<PersonDetailsState> = MutableStateFlow(PersonDetailsState())

@@ -29,3 +29,10 @@ fun Int.timestampToDate(format: Int): String =
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(this.toLong() * 1000))
         }
     }
+
+fun String.toCustomDateFormat(): Date =
+    if (this.isNotEmpty()) {
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(this) as Date
+    } else {
+        Date()
+    }

@@ -14,13 +14,12 @@ import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.LoadingScreen
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.payments.domain.model.Payment
-import org.mongodb.kbson.ObjectId
 
 @Composable
 fun PaymentsContent(
     modifier: Modifier = Modifier,
     payments: RequestState<List<Payment>>,
-    onSelect: ((ObjectId) -> Unit)? = null,
+    onSelect: ((String) -> Unit)? = null,
 ) {
     payments.DisplayResult(
         onError = { message ->
@@ -38,7 +37,7 @@ fun PaymentsContent(
                 ) {
                     items(
                         items = list,
-                        key = { person -> person.id.toHexString() }
+                        key = { person -> person.id }
                     ) { payment ->
                         ListPaymentComponent(
                             payment = payment,

@@ -29,13 +29,12 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.core.common.Constants.banksList
-import com.jvg.peopleapp.core.common.Constants.paymentMethodsList
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
 import com.jvg.peopleapp.core.presentation.ui.components.CustomOutlinedTextField
 import com.jvg.peopleapp.core.presentation.ui.components.DatePickerComponent
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.TextFieldComponent
+import com.jvg.peopleapp.payments.domain.model.Banks
 import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 import com.jvg.peopleapp.payments.presentation.payment.components.BanksDropDownComponent
 import com.jvg.peopleapp.payments.presentation.payment.components.PaymentMethodsRadioComponent
@@ -44,9 +43,8 @@ import com.jvg.peopleapp.payments.presentation.payment.viewmodel.PaymentViewMode
 import com.jvg.peopleapp.people.presentation.components.PeopleDropDownComponent
 import org.koin.core.parameter.emptyParametersHolder
 import org.koin.core.parameter.parametersOf
-import org.mongodb.kbson.ObjectId
 
-data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
+data class CreatePaymentScreen(val id: String? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -113,7 +111,9 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 10.dp),
-                        paymentMethods = paymentMethodsList,
+                        paymentMethods = PaymentMethods::class.sealedSubclasses.map {
+                            it.objectInstance as PaymentMethods
+                        },
                         onValueChanged = { method ->
                             viewModel.onEvent(PaymentEvents.OnPaymentMethodChanged(method))
                         }
@@ -124,7 +124,7 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp),
-                            value = editPayment?.reference ?: "",
+                            value = editPayment.reference ?: "",
                             newValue = { newValue ->
                                 viewModel.onEvent(PaymentEvents.OnReferenceChanged(newValue))
                             },
@@ -142,7 +142,7 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
                         BanksDropDownComponent(
                             label = "Bancos",
                             placeholder = "Seleccione un banco...",
-                            items = banksList,
+                            items = Banks::class.nestedClasses.map { it.objectInstance as Banks },
                             onValueChanged = { newValue ->
                                 viewModel.onEvent(PaymentEvents.OnBankChanged(newValue))
                             },
@@ -155,7 +155,7 @@ data class CreatePaymentScreen(val id: ObjectId? = null) : Screen {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp),
-                            value = editPayment?.holderCode ?: "",
+                            value = editPayment.holderCode ?: "",
                             newValue = { newValue ->
                                 viewModel.onEvent(PaymentEvents.OnHolderCodeChanged(newValue))
                             },

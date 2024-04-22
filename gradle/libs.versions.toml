@@ -1,19 +1,20 @@
 [versions]
 agp = "8.3.2"
 kotlin = "1.9.22"
-coreKtx = "1.12.0"
+coreKtx = "1.13.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2024.04.00"
+activityCompose = "1.9.0"
+composeBom = "2024.04.01"
 coilComposeVersion = "2.5.0"
 kotlinxCoroutinesCore = "1.8.0"
 kotlin-serialization = "1.6.2"
 koin-version = "3.5.4"
 voyager = "1.0.0"
 realm = "1.14.1"
+sqldelight = "2.0.2"
 
 [libraries]
 # [ANDROID]
@@ -57,6 +58,9 @@ voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", vers
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
+# [DATABASE: SQLDELIGHT]
+sqldelight = { module = "app.cash.sqldelight:android-driver", version.ref= "sqldelight" }
+
 # [DATABASE: REALM]
 realm-base = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
 
@@ -65,4 +69,5 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 realmKotlin = { id = "io.realm.kotlin", version.ref = "realm" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sqldelight = { id = "app.cash.sqldelight", version.ref  = "sqldelight" }
 

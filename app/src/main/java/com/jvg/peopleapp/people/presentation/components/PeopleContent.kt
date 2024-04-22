@@ -25,15 +25,14 @@ import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.LoadingScreen
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.people.domain.model.Person
-import org.mongodb.kbson.ObjectId
 
 @Composable
 fun PeopleContent(
     modifier: Modifier = Modifier,
     people: RequestState<List<Person>>,
-    onSelect: ((ObjectId) -> Unit)? = null,
-    onActive: ((ObjectId?, Boolean) -> Unit)? = null,
-    onDelete: ((ObjectId?) -> Unit)? = null
+    onSelect: ((String) -> Unit)? = null,
+    onActive: ((String?, Boolean) -> Unit)? = null,
+    onDelete: ((String?) -> Unit)? = null
 ) {
     var showDialog by remember {
         mutableStateOf(false)
@@ -108,7 +107,7 @@ fun PeopleContent(
                 ) {
                     items(
                         items = list,
-                        key = { person -> person.id.toHexString() }
+                        key = { person -> person.id }
                     ) { person ->
                         ListPersonComponent(
                             person = person,

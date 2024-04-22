@@ -1,0 +1,59 @@
+import kotlin.Boolean;
+
+CREATE TABLE person(
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT "",
+    lastname TEXT NOT NULL DEFAULT "",
+    code TEXT NOT NULL DEFAULT "",
+    phone TEXT NOT NULL DEFAULT "",
+    email TEXT NOT NULL DEFAULT "",
+    startsAt TEXT NOT NULL,
+    finishesAt TEXT NOT NULL,
+    active INTEGER AS Boolean NOT NULL DEFAULT 1,
+    createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TEXT DEFAULT NULL
+);
+
+getPeople:
+SELECT *
+FROM person
+ORDER BY active DESC;
+
+getActivePeople:
+SELECT *
+FROM person
+WHERE active == 1;
+
+getInactivePeople:
+SELECT *
+FROM person
+WHERE active == 0;
+
+getPersonById:
+SELECT *
+FROM person
+WHERE id == :id;
+
+addPerson:
+INSERT OR REPLACE
+INTO person(
+    id,
+    name,
+    lastname,
+    code,
+    phone,
+    email,
+    startsAt,
+    finishesAt,
+    active
+) VALUES (?,?,?,?,?,?,?,?,?);
+
+updateActivePerson:
+UPDATE person
+SET active = :isActive
+WHERE id == :id;
+
+deletePerson:
+DELETE FROM person
+WHERE id = :id;

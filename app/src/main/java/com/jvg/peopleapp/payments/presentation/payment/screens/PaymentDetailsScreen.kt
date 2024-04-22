@@ -15,9 +15,8 @@ import com.jvg.peopleapp.home.routes.DetailScreens
 import com.jvg.peopleapp.payments.presentation.payment.components.PaymentDetailsComponent
 import com.jvg.peopleapp.payments.presentation.payment.viewmodel.PaymentViewModel
 import org.koin.core.parameter.parametersOf
-import org.mongodb.kbson.ObjectId
 
-data class PaymentDetailsScreen(val id: ObjectId) : Screen {
+data class PaymentDetailsScreen(val id: String) : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @Composable

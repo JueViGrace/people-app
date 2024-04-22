@@ -24,20 +24,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.core.common.timestampToDate
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
 import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.TextFieldComponent
 import com.jvg.peopleapp.people.domain.model.Person
-import org.mongodb.kbson.ObjectId
 
 @Composable
 fun PersonDetailsComponent(
     person: Person,
     popBack: () -> Unit,
-    onAdd: (ObjectId) -> Unit
+    onAdd: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -156,7 +154,7 @@ fun PersonDetailsComponent(
 
                     TextFieldComponent(
                         modifier = Modifier.fillMaxWidth(),
-                        value = person.id.timestamp.timestampToDate(1),
+                        value = person.createdAt,
                         newValue = { _ -> },
                         icon = R.drawable.ic_calendar_month_24px,
                         readOnly = true,
@@ -197,7 +195,7 @@ fun PersonDetailsComponent(
                                 ),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CustomText(text = payment.id.toHexString())
+                                CustomText(text = payment.id)
                                 CustomText(text = payment.paymentMethod)
                             }
                         }

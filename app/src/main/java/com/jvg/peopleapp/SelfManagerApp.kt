@@ -1,7 +1,7 @@
 package com.jvg.peopleapp
 
 import android.app.Application
-import com.jvg.peopleapp.core.di.realmModule
+import com.jvg.peopleapp.core.di.databaseModule
 import com.jvg.peopleapp.dashboard.di.dashboardModule
 import com.jvg.peopleapp.payments.di.paymentsModule
 import com.jvg.peopleapp.people.di.peopleModule
@@ -17,7 +17,7 @@ class SelfManagerApp : Application() {
 
             androidContext(this@SelfManagerApp)
 
-            modules(realmModule, dashboardModule, peopleModule, paymentsModule)
+            modules(databaseModule, dashboardModule, peopleModule, paymentsModule)
         }
     }
 }

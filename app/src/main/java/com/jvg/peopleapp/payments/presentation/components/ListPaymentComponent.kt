@@ -14,17 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jvg.peopleapp.R
-import com.jvg.peopleapp.core.common.timestampToDate
 import com.jvg.peopleapp.core.presentation.ui.components.CustomClickableCard
 import com.jvg.peopleapp.core.presentation.ui.components.RowComponent
 import com.jvg.peopleapp.payments.domain.model.Payment
 import com.jvg.peopleapp.payments.domain.model.PaymentMethods
-import org.mongodb.kbson.ObjectId
 
 @Composable
 fun ListPaymentComponent(
     payment: Payment,
-    onSelect: (ObjectId) -> Unit
+    onSelect: (String) -> Unit
 ) {
     CustomClickableCard(
         onClick = {
@@ -48,7 +46,7 @@ fun ListPaymentComponent(
                 ),
                 icon = painterResource(id = R.drawable.ic_fingerprint_24px),
                 field = "Id",
-                value = payment.id.toHexString()
+                value = payment.id
             )
 
             RowComponent(
@@ -57,7 +55,7 @@ fun ListPaymentComponent(
                     .padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
                 field = "Fecha de creación",
-                value = payment.id.timestamp.timestampToDate(1),
+                value = payment.createdAt,
                 icon = painterResource(id = R.drawable.ic_calendar_month_24px)
             )
 
