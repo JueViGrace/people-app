@@ -37,7 +37,7 @@ fun PaymentsContent(
                 ) {
                     items(
                         items = list,
-                        key = { person -> person.id }
+                        key = { payment -> payment.id.toString() }
                     ) { payment ->
                         ListPaymentComponent(
                             payment = payment,

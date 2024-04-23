@@ -13,7 +13,6 @@ kotlinxCoroutinesCore = "1.8.0"
 kotlin-serialization = "1.6.2"
 koin-version = "3.5.4"
 voyager = "1.0.0"
-realm = "1.14.1"
 sqldelight = "2.0.2"
 
 [libraries]
@@ -59,15 +58,13 @@ voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", 
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 # [DATABASE: SQLDELIGHT]
-sqldelight = { module = "app.cash.sqldelight:android-driver", version.ref= "sqldelight" }
-
-# [DATABASE: REALM]
-realm-base = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
+sqldelight-android-driver = { group = "app.cash.sqldelight", name= "android-driver", version.ref= "sqldelight" }
+sqldelight-coroutines-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-async-extensions = { group = "app.cash.sqldelight", name = "async-extensions", version.ref = "sqldelight" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-realmKotlin = { id = "io.realm.kotlin", version.ref = "realm" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref  = "sqldelight" }
 

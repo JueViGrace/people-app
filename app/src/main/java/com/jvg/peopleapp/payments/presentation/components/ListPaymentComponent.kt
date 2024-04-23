@@ -21,10 +21,12 @@ import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 
 @Composable
 fun ListPaymentComponent(
+    modifier: Modifier = Modifier,
     payment: Payment,
     onSelect: (String) -> Unit
 ) {
     CustomClickableCard(
+        modifier = modifier,
         onClick = {
             onSelect(payment.id)
         }
@@ -98,13 +100,13 @@ fun ListPaymentComponent(
                             RowComponent(
                                 icon = painterResource(id = R.drawable.ic_checkbook_24px),
                                 field = "Referencia",
-                                value = payment.reference ?: ""
+                                value = payment.reference
                             )
 
                             RowComponent(
                                 icon = painterResource(id = R.drawable.ic_account_balance_24px),
                                 field = "Banco",
-                                value = payment.bank ?: ""
+                                value = payment.bank
                             )
                         }
                     }

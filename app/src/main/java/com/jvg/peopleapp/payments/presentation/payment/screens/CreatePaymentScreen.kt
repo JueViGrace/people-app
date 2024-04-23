@@ -114,6 +114,7 @@ data class CreatePaymentScreen(val id: String? = null) : Screen {
                         paymentMethods = PaymentMethods::class.sealedSubclasses.map {
                             it.objectInstance as PaymentMethods
                         },
+                        value = editPayment?.paymentMethod ?: PaymentMethods.Cash.method,
                         onValueChanged = { method ->
                             viewModel.onEvent(PaymentEvents.OnPaymentMethodChanged(method))
                         }
@@ -124,7 +125,7 @@ data class CreatePaymentScreen(val id: String? = null) : Screen {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp),
-                            value = editPayment.reference ?: "",
+                            value = editPayment.reference,
                             newValue = { newValue ->
                                 viewModel.onEvent(PaymentEvents.OnReferenceChanged(newValue))
                             },
@@ -143,6 +144,7 @@ data class CreatePaymentScreen(val id: String? = null) : Screen {
                             label = "Bancos",
                             placeholder = "Seleccione un banco...",
                             items = Banks::class.nestedClasses.map { it.objectInstance as Banks },
+                            value = editPayment.bank,
                             onValueChanged = { newValue ->
                                 viewModel.onEvent(PaymentEvents.OnBankChanged(newValue))
                             },
@@ -155,7 +157,7 @@ data class CreatePaymentScreen(val id: String? = null) : Screen {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp),
-                            value = editPayment.holderCode ?: "",
+                            value = editPayment.holderCode,
                             newValue = { newValue ->
                                 viewModel.onEvent(PaymentEvents.OnHolderCodeChanged(newValue))
                             },

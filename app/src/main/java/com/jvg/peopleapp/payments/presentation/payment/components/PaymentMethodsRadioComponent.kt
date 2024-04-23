@@ -4,10 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,12 +15,9 @@ import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 fun PaymentMethodsRadioComponent(
     modifier: Modifier = Modifier,
     paymentMethods: List<PaymentMethods>,
+    value: String,
     onValueChanged: (String) -> Unit
 ) {
-    var selectedMethod by remember {
-        mutableStateOf("")
-    }
-
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -40,9 +33,8 @@ fun PaymentMethodsRadioComponent(
                     value = method.method
                 )
                 RadioButton(
-                    selected = selectedMethod == method.method,
+                    selected = value == method.method,
                     onClick = {
-                        selectedMethod = method.method
                         onValueChanged(method.method)
                     }
                 )

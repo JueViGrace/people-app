@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.realmKotlin)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqldelight)
 }
@@ -104,11 +103,11 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
 
-    // Realm
-    implementation(libs.realm.base)
-
     // Sqldelight
-    implementation(libs.sqldelight)
+    implementation(libs.sqldelight.android.driver)
+    implementation(libs.sqldelight.coroutines.extensions)
+    implementation(libs.sqldelight.async.extensions)
+
     implementation(kotlin("reflect"))
 }
 

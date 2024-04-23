@@ -1,14 +1,14 @@
 import kotlin.Boolean;
 
-CREATE TABLE person(
+CREATE TABLE person (
     id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL DEFAULT "",
     lastname TEXT NOT NULL DEFAULT "",
     code TEXT NOT NULL DEFAULT "",
     phone TEXT NOT NULL DEFAULT "",
     email TEXT NOT NULL DEFAULT "",
-    startsAt TEXT NOT NULL,
-    finishesAt TEXT NOT NULL,
+    startsAt TEXT NOT NULL DEFAULT "",
+    finishesAt TEXT NOT NULL DEFAULT "",
     active INTEGER AS Boolean NOT NULL DEFAULT 1,
     createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -18,26 +18,40 @@ CREATE TABLE person(
 getPeople:
 SELECT *
 FROM person
-ORDER BY active DESC;
+WHERE
+deletedAt ISNULL
+ORDER BY
+createdAt DESC;
 
 getActivePeople:
 SELECT *
 FROM person
-WHERE active == 1;
+WHERE
+deletedAt ISNULL
+AND
+active == 1;
 
 getInactivePeople:
 SELECT *
 FROM person
-WHERE active == 0;
+WHERE
+deletedAt ISNULL
+AND
+active == 0;
 
 getPersonById:
 SELECT *
 FROM person
-WHERE id == :id;
+LEFT JOIN payment
+ON payment.personId == person.id
+WHERE
+person.id == :id
+AND
+person.deletedAt ISNULL;
 
 addPerson:
 INSERT OR REPLACE
-INTO person(
+INTO person (
     id,
     name,
     lastname,
@@ -47,13 +61,92 @@ INTO person(
     startsAt,
     finishesAt,
     active
-) VALUES (?,?,?,?,?,?,?,?,?);
+)
+VALUES ?;
 
 updateActivePerson:
 UPDATE person
-SET active = :isActive
-WHERE id == :id;
+SET
+active = :isActive,
+updatedAt = CURRENT_TIMESTAMP
+WHERE
+id == :id;
+
+softDeletePerson:
+UPDATE person
+SET deletedAt = CURRENT_TIMESTAMP
+WHERE
+id == :id;
 
 deletePerson:
 DELETE FROM person
-WHERE id = :id;
+WHERE
+id == :id;
+
+deletePeople:
+DELETE FROM person;
+
+CREATE TABLE payment (
+    id TEXT NOT NULL PRIMARY KEY,
+    paymentMethod TEXT NOT NULL DEFAULT "",
+    reference TEXT NOT NULL DEFAULT "",
+    bank TEXT NOT NULL DEFAULT "",
+    holderCode TEXT NOT NULL DEFAULT "",
+    amount REAL NOT NULL DEFAULT 0.0,
+    madeAt TEXT NOT NULL DEFAULT "",
+    note TEXT NOT NULL DEFAULT "",
+    createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TEXT DEFAULT NULL,
+    personId TEXT NOT NULL DEFAULT ""
+);
+
+getPayments:
+SELECT *
+FROM payment
+LEFT JOIN person
+ON person.id == payment.personId
+WHERE
+payment.deletedAt ISNULL
+ORDER BY
+payment.createdAt DESC;
+
+getPaymentById:
+SELECT *
+FROM payment
+LEFT JOIN person
+ON person.id == payment.personId
+WHERE
+payment.deletedAt ISNULL
+AND
+payment.id == :id;
+
+addPayment:
+INSERT OR REPLACE
+INTO payment (
+    id,
+    paymentMethod,
+    reference,
+    bank,
+    holderCode,
+    amount,
+    madeAt,
+    note,
+    personId
+)
+VALUES  ?;
+
+softDeletePayment:
+UPDATE payment
+SET
+deletedAt = CURRENT_TIMESTAMP
+WHERE
+id = :id;
+
+deletePayment:
+DELETE FROM payment
+WHERE
+id = :id;
+
+deletePayments:
+DELETE FROM payment;

@@ -6,12 +6,12 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.state.RequestState
-import com.jvg.peopleapp.payments.data.local.sources.PaymentsDataSource
 import com.jvg.peopleapp.payments.domain.model.Payment
+import com.jvg.peopleapp.payments.domain.repository.PaymentsRepository
 import com.jvg.peopleapp.payments.domain.rules.PaymentValidator
 import com.jvg.peopleapp.payments.presentation.payment.events.PaymentEvents
 import com.jvg.peopleapp.payments.presentation.payment.state.PaymentDetailsState
-import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
+import com.jvg.peopleapp.people.domain.repository.PeopleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PaymentViewModel(
-    private val paymentsDataSource: PaymentsDataSource,
-    private val peopleDataSource: PeopleDataSource,
+    private val paymentsRepository: PaymentsRepository,
+    private val peopleRepository: PeopleRepository,
     private val id: String? = null
 ) : ScreenModel {
     private var _state: MutableStateFlow<PaymentDetailsState> = MutableStateFlow(PaymentDetailsState())
@@ -38,7 +38,7 @@ class PaymentViewModel(
         }
 
         screenModelScope.launch {
-            peopleDataSource.getAllPeople().collect { value ->
+            peopleRepository.getAllPeople().collect { value ->
                 _state.update { paymentDetailsState ->
                     paymentDetailsState.copy(
                         people = value
@@ -54,14 +54,14 @@ class PaymentViewModel(
             }
 
             screenModelScope.launch {
-                paymentsDataSource.getPaymentById(id).collect { value ->
+                paymentsRepository.getPaymentById(id).collect { value ->
                     _state.update { paymentDetailsState ->
                         paymentDetailsState.copy(
                             payment = value,
-                            selectedPayment = value.getSuccessDataOrNull()?.id
+                            selectedPayment = if (value.isSuccess()) value.getSuccessData().id else null
                         )
                     }
-                    newPayment = value.getSuccessDataOrNull()
+                    newPayment = if (value.isSuccess()) value.getSuccessData() else null
                 }
             }
         } else {
@@ -114,7 +114,7 @@ class PaymentViewModel(
             PaymentEvents.DeletePayment -> {
                 screenModelScope.launch(Dispatchers.IO) {
                     _state.value.selectedPayment?.let { id ->
-                        paymentsDataSource.deletePayment(id)
+                        paymentsRepository.deletePayment(id)
                     }
                 }
             }
@@ -163,7 +163,7 @@ class PaymentViewModel(
                         }
 
                         screenModelScope.launch(Dispatchers.IO) {
-                            paymentsDataSource.addPayment(payment)
+                            paymentsRepository.addPayment(payment)
                         }
                     } else {
                         _state.update { paymentDetailsState ->

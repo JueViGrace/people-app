@@ -2,13 +2,18 @@ package com.jvg.peopleapp.people.di
 
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSourceImpl
+import com.jvg.peopleapp.people.domain.repository.PeopleRepository
 import com.jvg.peopleapp.people.presentation.person.viewmodel.PersonViewModel
 import com.jvg.peopleapp.people.presentation.viewmodel.PeopleViewModel
 import org.koin.dsl.module
 
 val peopleModule = module {
     single<PeopleDataSource> {
-        PeopleDataSourceImpl(get())
+        PeopleDataSourceImpl(get(), get())
+    }
+
+    single {
+        PeopleRepository(get())
     }
 
     factory {

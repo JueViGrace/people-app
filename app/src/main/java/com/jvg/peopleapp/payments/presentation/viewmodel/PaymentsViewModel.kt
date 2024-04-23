@@ -3,7 +3,7 @@ package com.jvg.peopleapp.payments.presentation.viewmodel
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.state.RequestState
-import com.jvg.peopleapp.payments.data.local.sources.PaymentsDataSource
+import com.jvg.peopleapp.payments.domain.repository.PaymentsRepository
 import com.jvg.peopleapp.payments.presentation.state.PaymentsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PaymentsViewModel(
-    private val paymentsDataSource: PaymentsDataSource,
+    private val paymentsRepository: PaymentsRepository,
 ) : ScreenModel {
 
     private var _state: MutableStateFlow<PaymentsState> = MutableStateFlow(PaymentsState())
@@ -26,7 +26,7 @@ class PaymentsViewModel(
         }
 
         screenModelScope.launch {
-            paymentsDataSource.getAllPayments().collect { value ->
+            paymentsRepository.getAllPayments().collect { value ->
                 _state.update { paymentsState ->
                     paymentsState.copy(
                         payments = value

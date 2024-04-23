@@ -70,7 +70,7 @@ object PeopleScreen : Screen {
                     viewModel.onEvent(PeopleEvents.OnSetActive(id, isActive))
                 },
                 onDelete = { id ->
-                    viewModel.onEvent(PeopleEvents.OnDeletePerson(id))
+                    viewModel.onEvent(PeopleEvents.OnSoftDeletePerson(id))
                 }
             )
         }

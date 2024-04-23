@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jvg.peopleapp.core.state.RequestState
-import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.people.domain.model.Person
+import com.jvg.peopleapp.people.domain.repository.PeopleRepository
 import com.jvg.peopleapp.people.domain.rules.PersonValidator
 import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
 import com.jvg.peopleapp.people.presentation.person.state.PersonDetailsState
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PersonViewModel(
-    private val peopleDataSource: PeopleDataSource,
+    private val peopleRepository: PeopleRepository,
     private val id: String? = null
 ) : ScreenModel {
 
@@ -38,14 +38,14 @@ class PersonViewModel(
             }
 
             screenModelScope.launch {
-                peopleDataSource.getOneById(id).collect { value ->
+                peopleRepository.getOneById(id).collect { value ->
                     _state.update { personDetailsState ->
                         personDetailsState.copy(
                             person = value,
-                            selectedPerson = value.getSuccessDataOrNull()?.id
+                            selectedPerson = if (value.isSuccess()) value.getSuccessData().id else null
                         )
                     }
-                    newPerson = value.getSuccessDataOrNull()
+                    newPerson = if (value.isSuccess()) value.getSuccessData() else null
                 }
             }
         } else {
@@ -58,7 +58,7 @@ class PersonViewModel(
             is PersonEvent.DeletePerson -> {
                 screenModelScope.launch(Dispatchers.IO) {
                     _state.value.selectedPerson?.let { id ->
-                        peopleDataSource.deletePerson(id)
+                        peopleRepository.softDeletePerson(id)
                     }
                 }
             }
@@ -130,7 +130,7 @@ class PersonViewModel(
                         }
 
                         screenModelScope.launch(Dispatchers.IO) {
-                            peopleDataSource.addPerson(person)
+                            peopleRepository.addPerson(person)
                         }
                     } else {
                         _state.update { peopleState ->

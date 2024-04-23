@@ -41,16 +41,13 @@ fun BanksDropDownComponent(
     placeholder: String,
     painter: Painter? = null,
     items: List<Banks>,
+    value: String,
     onValueChanged: (Banks) -> Unit,
     supportingText: String? = null,
     errorStatus: Boolean = false
 ) {
     var expanded by remember {
         mutableStateOf(false)
-    }
-
-    var selectedBank by remember {
-        mutableStateOf("")
     }
 
     var textFieldSize by remember {
@@ -71,9 +68,9 @@ fun BanksDropDownComponent(
                     textFieldSize = coordinates.size.toSize()
                 }
                 .padding(horizontal = 5.dp),
-            value = selectedBank,
-            onValueChanged = {
-                selectedBank = it
+            value = value,
+            onValueChanged = { _ ->
+
             },
             label = { CustomText(text = label) },
             placeholder = { CustomText(text = placeholder) },
@@ -134,7 +131,6 @@ fun BanksDropDownComponent(
                         }
                     },
                     onClick = {
-                        selectedBank = item.name
                         onValueChanged(item)
                         expanded = false
                     }

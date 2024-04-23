@@ -53,7 +53,7 @@ fun PaymentDetailsComponent(
         ) {
             item {
                 CustomClickableCard {
-                    if (payment.paymentMethod == PaymentMethods.Transfer.method){
+                    if (payment.paymentMethod == PaymentMethods.Transfer.method) {
                         RowComponent(
                             modifier = Modifier.fillMaxWidth(),
                             field = "Banco",
