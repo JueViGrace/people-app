@@ -12,15 +12,15 @@ object PaymentValidator {
         }
 
         if (payment.paymentMethod == PaymentMethods.Transfer.method) {
-            if (payment.reference?.isBlank() == true) {
+            if (payment.reference.isBlank()) {
                 result = result.copy(referenceError = "La referencia no puede estar vacía")
             }
 
-            if (payment.bank == null) {
+            if (payment.bank.isBlank()) {
                 result = result.copy(bankError = "Debe seleccionar un banco")
             }
 
-            if (payment.holderCode?.isBlank() == true) {
+            if (payment.holderCode.isBlank()) {
                 result = result.copy(holderCodeError = "Cédula del titular no puede estar vacía")
             }
         }

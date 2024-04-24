@@ -2,6 +2,7 @@ package com.jvg.peopleapp.people.data.local.sources
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import com.jvg.peopleapp.core.database.helper.DbHelper
 import com.jvg.peopleapp.core.database.mappers.toDatabase
 import com.jvg.peopleapp.core.database.mappers.toDomain
@@ -17,6 +18,15 @@ class PeopleDataSourceImpl(
     private val dbHelper: DbHelper,
     private val scope: CoroutineScope
 ) : PeopleDataSource {
+    override suspend fun countPeople(): Flow<Long> = scope.async {
+        dbHelper.withDatabase { db ->
+            db.selfManagerDBQueries
+                .countPeople()
+                .asFlow()
+                .mapToOne(scope.coroutineContext)
+        }
+    }.await()
+
     override suspend fun getAllPeople(): Flow<List<Person>> = scope.async {
         dbHelper.withDatabase { db ->
             db.selfManagerDBQueries

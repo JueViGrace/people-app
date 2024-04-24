@@ -2,6 +2,7 @@ package com.jvg.peopleapp.people.presentation.person.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -92,7 +93,7 @@ data class CreatePersonScreen(val id: String? = null) : Screen {
                         top = paddingValues.calculateTopPadding(),
                         bottom = paddingValues.calculateBottomPadding()
                     ),
-                verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
+                verticalArrangement = Arrangement.spacedBy(30.dp, Alignment.Top),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
@@ -239,6 +240,10 @@ data class CreatePersonScreen(val id: String? = null) : Screen {
                             }
                         )
                     }
+                }
+
+                item {
+                    Spacer(modifier = Modifier)
                 }
             }
         }

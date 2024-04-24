@@ -4,6 +4,7 @@ import com.jvg.peopleapp.people.domain.model.Person
 import kotlinx.coroutines.flow.Flow
 
 interface PeopleDataSource {
+    suspend fun countPeople(): Flow<Long>
     suspend fun getAllPeople(): Flow<List<Person>>
     suspend fun getActivePeople(): Flow<List<Person>>
     suspend fun getInactivePeople(): Flow<List<Person>>

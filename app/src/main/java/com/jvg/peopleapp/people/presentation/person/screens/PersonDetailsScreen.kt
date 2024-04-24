@@ -9,10 +9,13 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.LoadingScreen
 import com.jvg.peopleapp.home.routes.DetailScreens
+import com.jvg.peopleapp.home.routes.HomeTabs
 import com.jvg.peopleapp.people.presentation.person.components.PersonDetailsComponent
+import com.jvg.peopleapp.people.presentation.person.events.PersonEvent
 import com.jvg.peopleapp.people.presentation.person.viewmodel.PersonViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -22,17 +25,17 @@ data class PersonDetailsScreen(val id: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
+        val tabNavigator = LocalTabNavigator.current
         val viewModel = getScreenModel<PersonViewModel>(parameters = { parametersOf(id) })
         val state by viewModel.state.collectAsState()
-
-        // TODO: DELETE BUTTON
 
         state.person.DisplayResult(
             onLoading = {
                 LoadingScreen()
             },
-            onError = {
-                ErrorScreen()
+            onError = { message ->
+                ErrorScreen(message = message)
             },
             onSuccess = { person ->
                 PersonDetailsComponent(
@@ -44,7 +47,13 @@ data class PersonDetailsScreen(val id: String) : Screen {
                         navigator.push(DetailScreens.CreatePerson(id).screen)
                     },
                     onPayment = { id ->
-                        navigator.push(DetailScreens.PaymentDetails(id).screen)
+                        if (tabNavigator.current != HomeTabs.Payments.tab){
+                            navigator.push(DetailScreens.PaymentDetails(id).screen)
+                        }
+                    },
+                    onDelete = {
+                        viewModel.onEvent(PersonEvent.DeletePerson)
+                        navigator.pop()
                     }
                 )
             }

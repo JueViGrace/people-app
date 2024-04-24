@@ -41,16 +41,13 @@ fun PeopleDropDownComponent(
     placeholder: String,
     painter: Painter? = null,
     people: List<Person>,
+    value:String,
     onValueChanged: (Person) -> Unit,
     supportingText: String? = null,
     errorStatus: Boolean = false
 ) {
     var expanded by remember {
         mutableStateOf(false)
-    }
-
-    var selectedPerson by remember {
-        mutableStateOf("")
     }
 
     var textFieldSize by remember {
@@ -71,9 +68,8 @@ fun PeopleDropDownComponent(
                     textFieldSize = coordinates.size.toSize()
                 }
                 .padding(horizontal = 5.dp),
-            value = selectedPerson,
+            value = value,
             onValueChanged = {
-                selectedPerson = it
             },
             label = { CustomText(text = label) },
             placeholder = { CustomText(text = placeholder) },
@@ -134,7 +130,6 @@ fun PeopleDropDownComponent(
                         }
                     },
                     onClick = {
-                        selectedPerson = "${person.name} ${person.lastname}"
                         onValueChanged(person)
                         expanded = false
                     }

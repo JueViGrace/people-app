@@ -9,9 +9,11 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.LoadingScreen
 import com.jvg.peopleapp.home.routes.DetailScreens
+import com.jvg.peopleapp.home.routes.HomeTabs
 import com.jvg.peopleapp.payments.presentation.payment.components.PaymentDetailsComponent
 import com.jvg.peopleapp.payments.presentation.payment.viewmodel.PaymentViewModel
 import org.koin.core.parameter.parametersOf
@@ -22,6 +24,7 @@ data class PaymentDetailsScreen(val id: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val tabNavigator = LocalTabNavigator.current
         val viewModel = getScreenModel<PaymentViewModel>(parameters = { parametersOf(id) })
         val state by viewModel.state.collectAsState()
 
@@ -38,6 +41,11 @@ data class PaymentDetailsScreen(val id: String) : Screen {
                     },
                     popBack = {
                         navigator.pop()
+                    },
+                    onPerson = { id ->
+                        if (tabNavigator.current != HomeTabs.People.tab) {
+                            navigator.push(DetailScreens.PersonDetails(id).screen)
+                        }
                     }
                 )
             }

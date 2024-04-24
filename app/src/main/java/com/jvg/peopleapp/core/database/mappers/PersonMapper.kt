@@ -52,7 +52,21 @@ fun List<GetPersonById>.toPerson(): Person {
                         note = getPersonById.note ?: "",
                         createdAt = getPersonById.createdAt_ ?: "",
                         updatedAt = getPersonById.updatedAt_ ?: "",
-                        deletedAt = getPersonById.deletedAt_
+                        deletedAt = getPersonById.deletedAt_,
+                        person = Person(
+                            id = getPersonById.id,
+                            name = getPersonById.name,
+                            lastname = getPersonById.lastname,
+                            code = getPersonById.code,
+                            phone = getPersonById.phone,
+                            email = getPersonById.email,
+                            startsAt = getPersonById.startsAt,
+                            finishesAt = getPersonById.finishesAt,
+                            active = getPersonById.active,
+                            createdAt = getPersonById.createdAt,
+                            updatedAt = getPersonById.updatedAt,
+                            deletedAt = getPersonById.deletedAt
+                        )
                     )
                 )
             } else {
@@ -104,7 +118,21 @@ fun List<GetPersonById>.toPerson(): Person {
                     note = getPersonById.note ?: "",
                     createdAt = getPersonById.createdAt_ ?: "",
                     updatedAt = getPersonById.updatedAt_ ?: "",
-                    deletedAt = getPersonById.deletedAt_
+                    deletedAt = getPersonById.deletedAt_,
+                    person = Person(
+                        id = map.key.id,
+                        name = map.key.name,
+                        lastname = map.key.lastname,
+                        code = map.key.code,
+                        phone = map.key.phone,
+                        email = map.key.email,
+                        startsAt = map.key.startsAt,
+                        finishesAt = map.key.finishesAt,
+                        active = map.key.active,
+                        createdAt = map.key.createdAt,
+                        updatedAt = map.key.updatedAt,
+                        deletedAt = map.key.deletedAt
+                    )
                 )
             }
 

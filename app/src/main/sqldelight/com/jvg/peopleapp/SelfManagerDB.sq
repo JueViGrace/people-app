@@ -15,6 +15,12 @@ CREATE TABLE person (
     deletedAt TEXT DEFAULT NULL
 );
 
+countPeople:
+SELECT COUNT(*)
+FROM person
+WHERE
+deletedAt ISNULL;
+
 getPeople:
 SELECT *
 FROM person
@@ -29,7 +35,9 @@ FROM person
 WHERE
 deletedAt ISNULL
 AND
-active == 1;
+active == 1
+ORDER BY
+createdAt DESC;
 
 getInactivePeople:
 SELECT *
@@ -37,7 +45,9 @@ FROM person
 WHERE
 deletedAt ISNULL
 AND
-active == 0;
+active == 0
+ORDER BY
+createdAt DESC;
 
 getPersonById:
 SELECT *
@@ -47,7 +57,8 @@ ON payment.personId == person.id
 WHERE
 person.id == :id
 AND
-person.deletedAt ISNULL;
+person.deletedAt ISNULL
+ORDER BY payment.createdAt DESC;
 
 addPerson:
 INSERT OR REPLACE
@@ -101,6 +112,12 @@ CREATE TABLE payment (
     personId TEXT NOT NULL DEFAULT ""
 );
 
+countPayments:
+SELECT COUNT(*)
+FROM payment
+WHERE
+deletedAt ISNULL;
+
 getPayments:
 SELECT *
 FROM payment
@@ -109,7 +126,8 @@ ON person.id == payment.personId
 WHERE
 payment.deletedAt ISNULL
 ORDER BY
-payment.createdAt DESC;
+payment.createdAt DESC
+LIMIT :limit OFFSET :offset;
 
 getPaymentById:
 SELECT *

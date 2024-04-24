@@ -107,6 +107,11 @@ dependencies {
     implementation(libs.sqldelight.android.driver)
     implementation(libs.sqldelight.coroutines.extensions)
     implementation(libs.sqldelight.async.extensions)
+    implementation(libs.sqldelight.paging.extensions)
+
+    // Paging
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 
     implementation(kotlin("reflect"))
 }

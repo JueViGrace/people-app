@@ -4,11 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,11 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jvg.peopleapp.R
-import com.jvg.peopleapp.core.presentation.ui.components.CustomText
+import com.jvg.peopleapp.core.presentation.ui.components.DeleteAlertDialog
 import com.jvg.peopleapp.core.presentation.ui.components.ErrorScreen
 import com.jvg.peopleapp.core.presentation.ui.components.LoadingScreen
 import com.jvg.peopleapp.core.state.RequestState
@@ -42,52 +34,19 @@ fun PeopleContent(
     }
 
     if (showDialog) {
-        AlertDialog(
-            title = {
-                CustomText(
-                    text = stringResource(R.string.delete),
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize
-                )
+        DeleteAlertDialog(
+            questionText = "¿Seguro que quieres borrar a ${personToDelete?.name}?",
+            onShowChange = {
+                showDialog = it
             },
-            text = {
-                CustomText(
-                    text = "¿Seguro que quieres borrar a ${personToDelete?.name}?",
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                )
-            },
-            onDismissRequest = {
+            onDismiss = {
                 personToDelete = null
-                showDialog = false
             },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        personToDelete = null
-                        showDialog = false
-                    }
-                ) {
-                    CustomText(text = stringResource(R.string.cancel))
+            onConfirm = {
+                personToDelete?.let { person ->
+                    onDelete?.invoke(person.id)
                 }
-            },
-            confirmButton = {
-                ElevatedButton(
-                    onClick = {
-                        personToDelete?.let { person ->
-                            onDelete?.invoke(person.id)
-                        }
-                        showDialog = false
-                        personToDelete = null
-                    },
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                    )
-                ) {
-                    CustomText(
-                        text = stringResource(R.string.delete),
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
+                personToDelete = null
             }
         )
     }

@@ -246,6 +246,11 @@ data class CreatePaymentScreen(val id: String? = null) : Screen {
                                 label = "Persona",
                                 painter = painterResource(id = R.drawable.ic_person_24px),
                                 placeholder = "Persona a relacionar el pago",
+                                value = if (editPayment?.person != null) {
+                                    "${editPayment.person.name} ${editPayment.person.lastname}"
+                                } else {
+                                       ""
+                                       },
                                 onValueChanged = { newValue ->
                                     viewModel.onEvent(PaymentEvents.OnPersonChanged(newValue))
                                 },

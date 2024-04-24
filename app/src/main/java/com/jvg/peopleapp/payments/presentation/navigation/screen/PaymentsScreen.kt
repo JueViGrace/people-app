@@ -57,11 +57,10 @@ object PaymentsScreen : Screen {
                         top = innerPadding.calculateTopPadding(),
                         bottom = innerPadding.calculateBottomPadding()
                     ),
-                payments = state.payments,
-                onSelect = { id ->
-                    navigator.push(DetailScreens.PaymentDetails(id).screen)
-                }
-            )
+                payments = state.payments
+            ) { id ->
+                navigator.push(DetailScreens.PaymentDetails(id).screen)
+            }
         }
     }
 }

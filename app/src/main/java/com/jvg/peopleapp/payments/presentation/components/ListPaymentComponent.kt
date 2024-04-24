@@ -21,12 +21,10 @@ import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 
 @Composable
 fun ListPaymentComponent(
-    modifier: Modifier = Modifier,
     payment: Payment,
     onSelect: (String) -> Unit
 ) {
     CustomClickableCard(
-        modifier = modifier,
         onClick = {
             onSelect(payment.id)
         }
@@ -35,7 +33,7 @@ fun ListPaymentComponent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(5.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RowComponent(
@@ -55,7 +53,10 @@ fun ListPaymentComponent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(
+                    5.dp,
+                    Alignment.CenterHorizontally
+                ),
                 field = "Fecha de creación",
                 value = payment.createdAt,
                 icon = painterResource(id = R.drawable.ic_calendar_month_24px)
