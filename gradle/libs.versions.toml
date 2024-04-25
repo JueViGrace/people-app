@@ -12,6 +12,7 @@ coilComposeVersion = "2.5.0"
 kotlinxCoroutinesCore = "1.8.0"
 kotlin-serialization = "1.6.2"
 koin-version = "3.5.4"
+truth = "1.4.2"
 voyager = "1.0.0"
 sqldelight = "2.0.2"
 paging = "3.2.1"
@@ -33,6 +34,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
 
 # [COMPOSE]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }

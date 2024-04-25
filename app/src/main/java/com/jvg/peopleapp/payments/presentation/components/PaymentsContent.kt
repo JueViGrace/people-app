@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -37,7 +38,7 @@ fun PaymentsContent(
 
             if (pages.itemCount > 0) {
                 LazyColumn(
-                    modifier = modifier.padding(horizontal = 5.dp),
+                    modifier = modifier.padding(horizontal = 5.dp).testTag("PaymentsLazyColumn"),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
                 ) {

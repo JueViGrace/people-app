@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.jvg.peopleapp.core.common.toLikeSearch
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.payments.domain.model.Payment
 import com.jvg.peopleapp.payments.domain.repository.PaymentsRepository
@@ -30,15 +31,16 @@ class PaymentViewModel(
     var newPayment: Payment? by mutableStateOf(null)
         private set
 
+    var searchQuery: String by mutableStateOf("")
+        private set
+
     init {
         _state.update { paymentDetailsState ->
-            paymentDetailsState.copy(
-                people = RequestState.Loading
-            )
+            paymentDetailsState.copy(people = RequestState.Loading)
         }
 
         screenModelScope.launch {
-            peopleRepository.getAllPeople().collect { value ->
+            peopleRepository.searchPeople(searchQuery.toLikeSearch()).collect { value ->
                 _state.update { paymentDetailsState ->
                     paymentDetailsState.copy(
                         people = value
@@ -105,11 +107,29 @@ class PaymentViewModel(
                 newPayment = newPayment?.copy(
                     person = event.value
                 )
+                searchQuery = "${event.value.name} ${event.value.lastname}"
             }
             is PaymentEvents.OnReferenceChanged -> {
                 newPayment = newPayment?.copy(
                     reference = event.value
                 )
+            }
+            is PaymentEvents.OnSearchChanged -> {
+                _state.update { paymentDetailsState ->
+                    paymentDetailsState.copy(people = RequestState.Loading)
+                }
+
+                screenModelScope.launch {
+                    peopleRepository.searchPeople(event.value.toLikeSearch()).collect { value ->
+                        _state.update { paymentDetailsState ->
+                            paymentDetailsState.copy(
+                                people = value,
+                            )
+                        }
+                    }
+                }
+
+                searchQuery = event.value
             }
             PaymentEvents.DeletePayment -> {
                 screenModelScope.launch(Dispatchers.IO) {
@@ -133,6 +153,7 @@ class PaymentViewModel(
                     )
                 }
                 newPayment = null
+                searchQuery = ""
             }
             PaymentEvents.SavePayment -> {
                 newPayment?.let { payment: Payment ->

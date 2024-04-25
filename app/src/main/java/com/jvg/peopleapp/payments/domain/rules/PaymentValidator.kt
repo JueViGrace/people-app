@@ -1,5 +1,6 @@
 package com.jvg.peopleapp.payments.domain.rules
 
+import com.jvg.peopleapp.payments.domain.model.Banks
 import com.jvg.peopleapp.payments.domain.model.Payment
 import com.jvg.peopleapp.payments.domain.model.PaymentMethods
 
@@ -7,8 +8,15 @@ object PaymentValidator {
     fun validatePayment(payment: Payment): PaymentValidationResult {
         var result = PaymentValidationResult()
 
-        if (payment.paymentMethod.isBlank()){
+        if (payment.paymentMethod.isBlank()) {
             result = result.copy(paymentMethodError = "Debe seleccionar un método de pago")
+        } else if (
+            (
+            payment.paymentMethod != PaymentMethods.Transfer.method &&
+                payment.paymentMethod != PaymentMethods.Cash.method
+            )
+        ) {
+            result = result.copy(paymentMethodError = "Método de pago inválido")
         }
 
         if (payment.paymentMethod == PaymentMethods.Transfer.method) {
@@ -18,10 +26,19 @@ object PaymentValidator {
 
             if (payment.bank.isBlank()) {
                 result = result.copy(bankError = "Debe seleccionar un banco")
+            } else if (
+                (
+                payment.bank != Banks.Banesco.name &&
+                    payment.bank != Banks.BNC.name
+                )
+            ) {
+                result = result.copy(bankError = "Banco inválido")
             }
 
             if (payment.holderCode.isBlank()) {
-                result = result.copy(holderCodeError = "Cédula del titular no puede estar vacía")
+                result = result.copy(holderCodeError = "Tipo de documento no puede estar vacía")
+            } else if (payment.holderCode.map { it.isDigit() }.contains(false)) {
+                result = result.copy(holderCodeError = "Documento debe contener sólo números")
             }
         }
 

@@ -35,8 +35,8 @@ class PaymentsRepository(
                             pagingSource
                         }
                             .flow
-                            .map { pagingData ->
-                                pagingData.map { paymentEntity ->
+                            .map { value ->
+                                value.map { paymentEntity ->
                                     paymentEntity.toPayment()
                                 }
                             }

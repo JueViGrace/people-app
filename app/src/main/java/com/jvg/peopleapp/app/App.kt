@@ -13,7 +13,6 @@ import com.jvg.peopleapp.core.presentation.ui.theme.AppTheme
 @Composable
 fun App() {
     AppTheme {
-        // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {

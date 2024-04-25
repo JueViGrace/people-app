@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
@@ -27,11 +29,15 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.jvg.peopleapp.R
 import com.jvg.peopleapp.core.presentation.ui.components.CustomOutlinedTextField
 import com.jvg.peopleapp.core.presentation.ui.components.CustomText
+import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.people.domain.model.Person
 
 @Composable
@@ -40,9 +46,10 @@ fun PeopleDropDownComponent(
     label: String,
     placeholder: String,
     painter: Painter? = null,
-    people: List<Person>,
+    people: RequestState<List<Person>>,
     value:String,
-    onValueChanged: (Person) -> Unit,
+    onValueChanged: (String) -> Unit,
+    onPersonSelected: (Person) -> Unit,
     supportingText: String? = null,
     errorStatus: Boolean = false
 ) {
@@ -69,19 +76,26 @@ fun PeopleDropDownComponent(
                 }
                 .padding(horizontal = 5.dp),
             value = value,
-            onValueChanged = {
+            onValueChanged = { newValue ->
+                onValueChanged(newValue)
             },
             label = { CustomText(text = label) },
             placeholder = { CustomText(text = placeholder) },
-            trailingIcon = {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = "",
-                    modifier = Modifier.clickable {
-                        expanded = !expanded
-                    }
-                )
+            supportingText = if (supportingText != null) {
+                { CustomText(text = supportingText) }
+            } else {
+                null
             },
+            isError = errorStatus,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    expanded = true
+                }
+            ),
             leadingIcon = if (painter != null) {
                 {
                     Icon(
@@ -92,49 +106,62 @@ fun PeopleDropDownComponent(
             } else {
                 null
             },
-            supportingText = if (supportingText != null) {
-                { CustomText(text = supportingText) }
-            } else {
-                null
-            },
-            singleLine = true,
-            maxLines = 1,
-            isError = errorStatus,
-            readOnly = true
-        )
-
-        DropdownMenu(
-            modifier = Modifier
-                .width(
-                    with(LocalDensity.current) { textFieldSize.width.toDp() }
-                ),
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            people.forEach { person ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_person_24px),
-                                contentDescription = ""
-                            )
-                            CustomText(
-                                text = "${person.name} ${person.lastname}",
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    },
-                    onClick = {
-                        onValueChanged(person)
-                        expanded = false
+            trailingIcon = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "",
+                    modifier = Modifier.clickable {
+                        expanded = !expanded
                     }
                 )
             }
-        }
+        )
+
+        people.DisplayResult(
+            onError = { _ -> },
+            onLoading = {},
+            onSuccess = { list ->
+                DropdownMenu(
+                    modifier = Modifier
+                        .width(
+                            with(LocalDensity.current) { textFieldSize.width.toDp() }
+                        ),
+                    offset = DpOffset(
+                        y = with(LocalDensity.current) { textFieldSize.height.toDp() },
+                        x = 0.dp
+                    ),
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    list.forEach { person ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        5.dp,
+                                        Alignment.CenterHorizontally
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_person_24px),
+                                        contentDescription = ""
+                                    )
+                                    CustomText(
+                                        text = "${person.name} ${person.lastname}",
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            },
+                            onClick = {
+                                onPersonSelected(person)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        )
     }
 }

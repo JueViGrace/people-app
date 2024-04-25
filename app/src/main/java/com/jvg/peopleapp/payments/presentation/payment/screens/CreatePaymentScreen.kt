@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -30,7 +29,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jvg.peopleapp.R
 import com.jvg.peopleapp.core.presentation.ui.components.AppBar
-import com.jvg.peopleapp.core.presentation.ui.components.CustomOutlinedTextField
 import com.jvg.peopleapp.core.presentation.ui.components.DatePickerComponent
 import com.jvg.peopleapp.core.presentation.ui.components.FABComponent
 import com.jvg.peopleapp.core.presentation.ui.components.TextFieldComponent
@@ -204,60 +202,20 @@ data class CreatePaymentScreen(val id: String? = null) : Screen {
                         errorStatus = state.madeAtError?.isNotEmpty() ?: false
                     )
 
-                    state.people.DisplayResult(
-                        onError = { message ->
-                            CustomOutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 5.dp),
-                                value = message,
-                                onValueChanged = {},
-                                readOnly = true,
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_person_24px),
-                                        contentDescription = "",
-                                    )
-                                }
-                            )
+                    PeopleDropDownComponent(
+                        people = state.people,
+                        label = "Persona",
+                        painter = painterResource(id = R.drawable.ic_person_24px),
+                        placeholder = "Busque una persona...",
+                        value = viewModel.searchQuery,
+                        onValueChanged = { newValue ->
+                            viewModel.onEvent(PaymentEvents.OnSearchChanged(newValue))
                         },
-                        onLoading = {
-                            CustomOutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 5.dp),
-                                value = "",
-                                onValueChanged = {},
-                                readOnly = true,
-                                trailingIcon = {
-                                    CircularProgressIndicator()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_person_24px),
-                                        contentDescription = "",
-                                    )
-                                }
-                            )
+                        onPersonSelected = { person ->
+                            viewModel.onEvent(PaymentEvents.OnPersonChanged(person))
                         },
-                        onSuccess = { list ->
-                            PeopleDropDownComponent(
-                                people = list,
-                                label = "Persona",
-                                painter = painterResource(id = R.drawable.ic_person_24px),
-                                placeholder = "Persona a relacionar el pago",
-                                value = if (editPayment?.person != null) {
-                                    "${editPayment.person.name} ${editPayment.person.lastname}"
-                                } else {
-                                       ""
-                                       },
-                                onValueChanged = { newValue ->
-                                    viewModel.onEvent(PaymentEvents.OnPersonChanged(newValue))
-                                },
-                                supportingText = state.personError,
-                                errorStatus = state.personError?.isNotEmpty() ?: false
-                            )
-                        },
+                        supportingText = state.personError,
+                        errorStatus = state.personError?.isNotEmpty() ?: false
                     )
                 }
 

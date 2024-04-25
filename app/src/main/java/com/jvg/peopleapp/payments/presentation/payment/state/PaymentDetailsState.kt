@@ -6,7 +6,7 @@ import com.jvg.peopleapp.people.domain.model.Person
 
 data class PaymentDetailsState(
     val payment: RequestState<Payment> = RequestState.Loading,
-    val people: RequestState<List<Person>> = RequestState.Idle,
+    val people: RequestState<List<Person>> = RequestState.Loading,
     val selectedPayment: String? = null,
     val paymentMethodError: String? = null,
     val referenceError: String? = null,

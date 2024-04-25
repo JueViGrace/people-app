@@ -27,7 +27,8 @@ FROM person
 WHERE
 deletedAt ISNULL
 ORDER BY
-createdAt DESC;
+createdAt DESC
+LIMIT :limit OFFSET :offset;
 
 getActivePeople:
 SELECT *
@@ -59,6 +60,16 @@ person.id == :id
 AND
 person.deletedAt ISNULL
 ORDER BY payment.createdAt DESC;
+
+searchPeople:
+SELECT *
+FROM person
+WHERE
+(
+person.name LIKE(:name) OR
+person.lastname LIKE(:name)
+) AND
+person.deletedAt ISNULL;
 
 addPerson:
 INSERT OR REPLACE

@@ -68,11 +68,10 @@ object PeopleScreen : Screen {
                 },
                 onActive = { id, isActive: Boolean ->
                     viewModel.onEvent(PeopleEvents.OnSetActive(id, isActive))
-                },
-                onDelete = { id ->
-                    viewModel.onEvent(PeopleEvents.OnSoftDeletePerson(id))
                 }
-            )
+            ) { id ->
+                viewModel.onEvent(PeopleEvents.OnSoftDeletePerson(id))
+            }
         }
     }
 }

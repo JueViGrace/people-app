@@ -12,6 +12,7 @@ sealed interface PaymentEvents {
     data class OnAmountChanged(val value: Double) : PaymentEvents
     data class OnNoteChanged(val value: String) : PaymentEvents
     data class OnPersonChanged(val value: Person) : PaymentEvents
+    data class OnSearchChanged(val value: String) : PaymentEvents
     data object SavePayment : PaymentEvents
     data object DismissPayment : PaymentEvents
     data object DeletePayment : PaymentEvents

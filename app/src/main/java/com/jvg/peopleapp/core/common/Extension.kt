@@ -31,5 +31,6 @@ fun Int.timestampToDate(format: Int): String =
     }
 
 fun String.toCustomDateFormat(): String =
-        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(this).toStringFormat(2)
+    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(this).toStringFormat(2)
 
+fun String.toLikeSearch() = "%$this%"
