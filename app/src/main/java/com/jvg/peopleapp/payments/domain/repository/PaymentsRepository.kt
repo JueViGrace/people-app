@@ -3,7 +3,7 @@ package com.jvg.peopleapp.payments.domain.repository
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.jvg.peopleapp.core.common.Constants.DB_ERROR_MESSAGE
-import com.jvg.peopleapp.core.database.mappers.toPayment
+import com.jvg.peopleapp.core.mappers.toPayment
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.payments.data.local.sources.PaymentsDataSource
 import com.jvg.peopleapp.payments.domain.model.Payment

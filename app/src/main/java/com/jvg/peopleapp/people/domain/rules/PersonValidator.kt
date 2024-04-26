@@ -20,8 +20,8 @@ object PersonValidator {
             result = result.copy(emailError = "Email debe ser un email válido")
         }
 
-        if (person.code.isBlank()) {
-            result = result.copy(codeError = "Cédula no puede estar vacío")
+        if (person.code.map{ it.isDigit() }.contains(false)) {
+            result = result.copy(codeError = "Cédula solo debe contener números")
         }
 
         if (person.phone.length < PHONE_LENGTH) {

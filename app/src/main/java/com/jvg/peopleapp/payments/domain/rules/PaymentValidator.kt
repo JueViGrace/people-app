@@ -27,10 +27,9 @@ object PaymentValidator {
             if (payment.bank.isBlank()) {
                 result = result.copy(bankError = "Debe seleccionar un banco")
             } else if (
-                (
-                payment.bank != Banks.Banesco.name &&
-                    payment.bank != Banks.BNC.name
-                )
+                !Banks::class.sealedSubclasses.map { kClass ->
+                    kClass.objectInstance?.name
+                }.contains(payment.bank)
             ) {
                 result = result.copy(bankError = "Banco inválido")
             }

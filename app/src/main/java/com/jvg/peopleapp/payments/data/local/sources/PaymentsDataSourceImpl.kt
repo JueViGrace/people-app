@@ -9,8 +9,8 @@ import app.cash.sqldelight.paging3.QueryPagingSource
 import com.jvg.peopleapp.GetPayments
 import com.jvg.peopleapp.core.common.Constants
 import com.jvg.peopleapp.core.database.helper.DbHelper
-import com.jvg.peopleapp.core.database.mappers.toDatabase
-import com.jvg.peopleapp.core.database.mappers.toPayment
+import com.jvg.peopleapp.core.mappers.toDatabase
+import com.jvg.peopleapp.core.mappers.toPayment
 import com.jvg.peopleapp.payments.domain.model.Payment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

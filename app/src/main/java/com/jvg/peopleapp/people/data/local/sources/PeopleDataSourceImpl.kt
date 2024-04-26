@@ -10,9 +10,9 @@ import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.paging3.QueryPagingSource
 import com.jvg.peopleapp.core.common.Constants
 import com.jvg.peopleapp.core.database.helper.DbHelper
-import com.jvg.peopleapp.core.database.mappers.toDatabase
-import com.jvg.peopleapp.core.database.mappers.toDomain
-import com.jvg.peopleapp.core.database.mappers.toPerson
+import com.jvg.peopleapp.core.mappers.toDatabase
+import com.jvg.peopleapp.core.mappers.toDomain
+import com.jvg.peopleapp.core.mappers.toPerson
 import com.jvg.peopleapp.people.domain.model.Person
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async

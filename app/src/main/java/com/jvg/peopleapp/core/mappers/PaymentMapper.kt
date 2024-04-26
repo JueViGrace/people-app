@@ -1,4 +1,4 @@
-package com.jvg.peopleapp.core.database.mappers
+package com.jvg.peopleapp.core.mappers
 
 import com.jvg.peopleapp.GetPaymentById
 import com.jvg.peopleapp.GetPayments

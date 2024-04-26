@@ -1,4 +1,4 @@
-package com.jvg.peopleapp.core.database.mappers
+package com.jvg.peopleapp.core.mappers
 
 import com.jvg.peopleapp.GetPersonById
 import com.jvg.peopleapp.payments.domain.model.Payment
@@ -24,7 +24,7 @@ fun Person.toDatabase(): PersonEntity = PersonEntity(
     id = id,
     name = name,
     lastname = lastname,
-    code = code,
+    code = code.ifEmpty { "P.N." },
     phone = phone,
     email = email,
     startsAt = startsAt,

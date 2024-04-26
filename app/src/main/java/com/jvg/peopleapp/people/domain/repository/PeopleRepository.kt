@@ -3,7 +3,7 @@ package com.jvg.peopleapp.people.domain.repository
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.jvg.peopleapp.core.common.Constants.DB_ERROR_MESSAGE
-import com.jvg.peopleapp.core.database.mappers.toDomain
+import com.jvg.peopleapp.core.mappers.toDomain
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.people.data.local.sources.PeopleDataSource
 import com.jvg.peopleapp.people.domain.model.Person
