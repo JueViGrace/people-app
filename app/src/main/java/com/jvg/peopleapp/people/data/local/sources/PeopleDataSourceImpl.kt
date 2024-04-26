@@ -1,10 +1,14 @@
 package com.jvg.peopleapp.people.data.local.sources
 
-import androidx.paging.PagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.paging3.QueryPagingSource
+import com.jvg.peopleapp.core.common.Constants
 import com.jvg.peopleapp.core.database.helper.DbHelper
 import com.jvg.peopleapp.core.database.mappers.toDatabase
 import com.jvg.peopleapp.core.database.mappers.toDomain
@@ -22,27 +26,26 @@ class PeopleDataSourceImpl(
     private val dbHelper: DbHelper,
     private val scope: CoroutineScope
 ) : PeopleDataSource {
-    override suspend fun countPeople(): Flow<Long> = scope.async {
-        dbHelper.withDatabase { db ->
-            db.selfManagerDBQueries
-                .countPeople()
-                .asFlow()
-                .mapToOne(scope.coroutineContext)
-        }
-    }.await()
-
-    override suspend fun getAllPeople(): Flow<PagingSource<Int, PersonEntity>> = flow {
+    override suspend fun getAllPeople(): Flow<Flow<PagingData<PersonEntity>>> = flow {
         emit(
             scope.async {
                 dbHelper.withDatabase { db ->
                     val count = db.selfManagerDBQueries.countPeople()
 
-                    QueryPagingSource(
-                        countQuery = count,
-                        transacter = db.selfManagerDBQueries,
-                        context = scope.coroutineContext,
-                        queryProvider = db.selfManagerDBQueries::getPeople
-                    )
+                    Pager(
+                        PagingConfig(
+                            pageSize = Constants.MIN_PAGE,
+                            prefetchDistance = 20
+                        )
+                    ) {
+                        QueryPagingSource(
+                            countQuery = count,
+                            transacter = db.selfManagerDBQueries,
+                            context = scope.coroutineContext,
+                            queryProvider = db.selfManagerDBQueries::getPeople
+                        )
+                    }
+                        .flow
                 }
             }.await()
         )

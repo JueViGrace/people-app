@@ -1,10 +1,13 @@
 package com.jvg.peopleapp.payments.data.local.sources
 
-import androidx.paging.PagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.paging3.QueryPagingSource
 import com.jvg.peopleapp.GetPayments
+import com.jvg.peopleapp.core.common.Constants
 import com.jvg.peopleapp.core.database.helper.DbHelper
 import com.jvg.peopleapp.core.database.mappers.toDatabase
 import com.jvg.peopleapp.core.database.mappers.toPayment
@@ -31,18 +34,26 @@ class PaymentsDataSourceImpl(
         }
     }.await()
 
-    override fun getAllPayments(): Flow<PagingSource<Int, GetPayments>> = flow {
+    override fun getAllPayments(): Flow<Flow<PagingData<GetPayments>>> = flow {
         emit(
             scope.async {
                 dbHelper.withDatabase { db ->
                     val count = db.selfManagerDBQueries.countPayments()
 
-                    QueryPagingSource(
-                        countQuery = count,
-                        transacter = db.selfManagerDBQueries,
-                        context = scope.coroutineContext,
-                        queryProvider = db.selfManagerDBQueries::getPayments
-                    )
+                    Pager(
+                        PagingConfig(
+                            pageSize = Constants.MIN_PAGE,
+                            prefetchDistance = 20
+                        )
+                    ) {
+                        QueryPagingSource(
+                            countQuery = count,
+                            transacter = db.selfManagerDBQueries,
+                            context = scope.coroutineContext,
+                            queryProvider = db.selfManagerDBQueries::getPayments
+                        )
+                    }
+                        .flow
                 }
             }.await()
         )

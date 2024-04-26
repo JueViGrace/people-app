@@ -1,13 +1,12 @@
 package com.jvg.peopleapp.people.data.local.sources
 
-import androidx.paging.PagingSource
+import androidx.paging.PagingData
 import com.jvg.peopleapp.people.domain.model.Person
 import kotlinx.coroutines.flow.Flow
 import com.jvg.peopleapp.Person as PersonEntity
 
 interface PeopleDataSource {
-    suspend fun countPeople(): Flow<Long>
-    suspend fun getAllPeople(): Flow<PagingSource<Int, PersonEntity>>
+    suspend fun getAllPeople(): Flow<Flow<PagingData<PersonEntity>>>
     suspend fun getActivePeople(): Flow<List<Person>>
     suspend fun getInactivePeople(): Flow<List<Person>>
     suspend fun searchPeople(value: String): Flow<List<Person>>

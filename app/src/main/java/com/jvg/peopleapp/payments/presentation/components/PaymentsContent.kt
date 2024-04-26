@@ -36,36 +36,32 @@ fun PaymentsContent(
         onSuccess = { list ->
             val pages = list.collectAsLazyPagingItems()
 
-            if (pages.itemCount > 0) {
-                LazyColumn(
-                    modifier = modifier.padding(horizontal = 5.dp).testTag("PaymentsLazyColumn"),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
-                ) {
-                    items(
-                        count = pages.itemCount,
-                        key = pages.itemKey { item: Payment -> item.id },
-                        contentType = pages.itemContentType { "Payments" }
-                    ) { index ->
+            LazyColumn(
+                modifier = modifier.padding(horizontal = 5.dp).testTag("PaymentsLazyColumn"),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
+            ) {
+                items(
+                    count = pages.itemCount,
+                    key = pages.itemKey { item: Payment -> item.id },
+                    contentType = pages.itemContentType { "Payments" }
+                ) { index ->
 
-                        val payment = pages[index]
+                    val payment = pages[index]
 
-                        if (payment != null) {
-                            ListPaymentComponent(
-                                payment = payment,
-                                onSelect = { id ->
-                                    onSelect?.invoke(id)
-                                }
-                            )
-                        }
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(70.dp))
+                    if (payment != null) {
+                        ListPaymentComponent(
+                            payment = payment,
+                            onSelect = { id ->
+                                onSelect?.invoke(id)
+                            }
+                        )
                     }
                 }
-            } else {
-                ErrorScreen()
+
+                item {
+                    Spacer(modifier = Modifier.height(70.dp))
+                }
             }
         }
     )

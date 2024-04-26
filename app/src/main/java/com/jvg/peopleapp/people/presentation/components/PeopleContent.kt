@@ -1,6 +1,8 @@
 package com.jvg.peopleapp.people.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -62,39 +64,39 @@ fun PeopleContent(
         },
         onSuccess = { pagingData ->
             val pages = pagingData.collectAsLazyPagingItems()
-            if (pages.itemCount > 0) {
-                LazyColumn(
-                    modifier = modifier
-                        .padding(horizontal = 5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
-                ) {
-                    items(
-                        count = pages.itemCount,
-                        key = pages.itemKey { item -> item.id },
-                        contentType = pages.itemContentType { "People" }
-                    ) { index ->
-                        val person = pages [index]
-                        if (person != null) {
-                            ListPersonComponent(
-                                person = person,
-                                showActive = person.active,
-                                onSelect = { id ->
-                                    onSelect?.invoke(id)
-                                },
-                                onActive = { id, isActive ->
-                                    onActive?.invoke(id, isActive)
-                                },
-                                onDelete = { selectedPerson ->
-                                    personToDelete = selectedPerson
-                                    showDialog = true
-                                }
-                            )
-                        }
+            LazyColumn(
+                modifier = modifier
+                    .padding(horizontal = 5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
+            ) {
+                items(
+                    count = pages.itemCount,
+                    key = pages.itemKey { item -> item.id },
+                    contentType = pages.itemContentType { "People" }
+                ) { index ->
+                    val person = pages [index]
+                    if (person != null) {
+                        ListPersonComponent(
+                            person = person,
+                            showActive = person.active,
+                            onSelect = { id ->
+                                onSelect?.invoke(id)
+                            },
+                            onActive = { id, isActive ->
+                                onActive?.invoke(id, isActive)
+                            },
+                            onDelete = { selectedPerson ->
+                                personToDelete = selectedPerson
+                                showDialog = true
+                            }
+                        )
                     }
                 }
-            } else {
-                ErrorScreen()
+
+                item {
+                    Spacer(modifier = Modifier.height(70.dp))
+                }
             }
         }
     )

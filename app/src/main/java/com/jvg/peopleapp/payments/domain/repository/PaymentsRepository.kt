@@ -1,11 +1,8 @@
 package com.jvg.peopleapp.payments.domain.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.jvg.peopleapp.core.common.Constants.DB_ERROR_MESSAGE
-import com.jvg.peopleapp.core.common.Constants.MIN_PAGE
 import com.jvg.peopleapp.core.database.mappers.toPayment
 import com.jvg.peopleapp.core.state.RequestState
 import com.jvg.peopleapp.payments.data.local.sources.PaymentsDataSource
@@ -23,23 +20,14 @@ class PaymentsRepository(
     fun getAllPayments(): Flow<RequestState<Flow<PagingData<Payment>>>> = flow {
         emit(RequestState.Loading)
         try {
-            paymentsDataSource.getAllPayments().collect { pagingSource ->
+            paymentsDataSource.getAllPayments().collect { value ->
                 emit(
                     RequestState.Success(
-                        data = Pager(
-                            PagingConfig(
-                                pageSize = MIN_PAGE,
-                                prefetchDistance = 20
-                            )
-                        ) {
-                            pagingSource
-                        }
-                            .flow
-                            .map { value ->
-                                value.map { paymentEntity ->
-                                    paymentEntity.toPayment()
-                                }
+                        data = value.map { pagingData ->
+                            pagingData.map { paymentEntity ->
+                                paymentEntity.toPayment()
                             }
+                        }
                     )
                 )
             }
@@ -51,17 +39,15 @@ class PaymentsRepository(
     fun getPaymentById(id: String): Flow<RequestState<Payment>> = flow {
         emit(RequestState.Loading)
         try {
-            paymentsDataSource.getPaymentById(id)
-                .catch { e ->
-                    emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
+            paymentsDataSource.getPaymentById(id).catch { e ->
+                emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
+            }.collect { list ->
+                if (list.id.isNotEmpty()) {
+                    emit(RequestState.Success(data = list))
+                } else {
+                    emit(RequestState.Error(message = "Este pago no existe"))
                 }
-                .collect { list ->
-                    if (list.id.isNotEmpty()) {
-                        emit(RequestState.Success(data = list))
-                    } else {
-                        emit(RequestState.Error(message = "Este pago no existe"))
-                    }
-                }
+            }
         } catch (e: Exception) {
             emit(RequestState.Error(message = e.message ?: DB_ERROR_MESSAGE))
         }
